@@ -20,3 +20,25 @@
 
 .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ── Link animations ─────────────────────────────────────────── */
+@keyframes link-lift   { 0%,100% { transform:translateY(0);  box-shadow:none; }
+                         50%     { transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,.15); } }
+@keyframes link-bounce { 0%,100% { transform:translateY(0) scale(1);   }
+                         40%     { transform:translateY(-6px) scale(1.02); }
+                         60%     { transform:translateY(-3px) scale(1.01); } }
+@keyframes link-shake  { 0%,100% { transform:rotate(0deg);    }
+                         20%     { transform:rotate(-2deg);    }
+                         40%     { transform:rotate(2deg);     }
+                         60%     { transform:rotate(-1.5deg);  }
+                         80%     { transform:rotate(1.5deg);   } }
+@keyframes link-pulse  { 0%,100% { transform:scale(1);    opacity:1;   }
+                         50%     { transform:scale(1.03);  opacity:0.9; } }
+@keyframes link-glow   { 0%,100% { box-shadow:0 0 0   0   rgba(51,58,47,0);   }
+                         50%     { box-shadow:0 0 18px 4px rgba(51,58,47,0.30); } }
+
+.link-anim-lift:hover   { animation: link-lift   0.5s ease; }
+.link-anim-bounce:hover { animation: link-bounce 0.6s ease; }
+.link-anim-shake:hover  { animation: link-shake  0.5s ease; }
+.link-anim-pulse:hover  { animation: link-pulse  0.7s ease infinite; }
+.link-anim-glow:hover   { animation: link-glow   1s ease infinite; }

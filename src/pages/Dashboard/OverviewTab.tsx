@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import type { BioLink } from '../../types'
+import QRModal from '../../components/QRModal'
 
 interface Stats {
   views7d:      number
@@ -19,6 +20,7 @@ export default function OverviewTab({ onTabChange }: { onTabChange: (t: string) 
   const { profile } = useAuth()
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showQr, setShowQr] = useState(false)
   const publicUrl = `${window.location.origin}/u/${profile!.username}`
 
   useEffect(() => { load() }, [])
@@ -115,7 +117,7 @@ export default function OverviewTab({ onTabChange }: { onTabChange: (t: string) 
             { label: 'Thêm Link',     icon: Plus,       action: () => onTabChange('links'),      color: '#333A2F', bg: '#EBEDDF' },
             { label: 'Mở Editor',     icon: PenSquare,  action: () => {},                         color: '#7c3aed', bg: '#ede9fe', href: '/editor' },
             { label: 'Analytics',     icon: TrendingUp, action: () => onTabChange('analytics'),  color: '#2563eb', bg: '#dbeafe' },
-            { label: 'QR Code',       icon: QrCode,     action: () => onTabChange('settings'),   color: '#059669', bg: '#d1fae5' },
+            { label: 'QR Code',       icon: QrCode,     action: () => setShowQr(true),          color: '#059669', bg: '#d1fae5' },
           ].map(a => {
             const inner = (
               <button key={a.label} onClick={a.action}
@@ -247,6 +249,10 @@ export default function OverviewTab({ onTabChange }: { onTabChange: (t: string) 
           Xem →
         </a>
       </div>
+
+      {showQr && (
+        <QRModal url={publicUrl} username={profile!.username ?? 'user'} onClose={() => setShowQr(false)} />
+      )}
     </div>
   )
 }

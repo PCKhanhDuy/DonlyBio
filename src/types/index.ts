@@ -27,6 +27,18 @@ export interface CustomSettings {
   announcement?:     string
   announcementUrl?:  string
   announcementColor?: string
+  // Link animation on hover
+  linkAnimation?:    'none' | 'lift' | 'pulse' | 'shake' | 'glow' | 'bounce'
+  // Custom CSS (Pro)
+  customCss?:        string
+  // VCard download on public page
+  vcardEnabled?:     boolean
+  // Music player widget
+  musicWidgetUrl?:   string
+  // Contact form
+  contactFormEnabled?: boolean
+  // Testimonials block
+  testimonialsEnabled?: boolean
 }
 
 export const DEFAULT_SETTINGS: CustomSettings = {

@@ -683,6 +683,33 @@ export default function AppearanceTab() {
               <p className="text-sm text-gray-700 font-medium">Drop shadow</p>
               <Toggle on={settings.linkShadow} onChange={() => set('linkShadow', !settings.linkShadow)} />
             </div>
+
+            <div>
+              <p className="text-xs text-gray-500 mb-2">Hover animation</p>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { key: 'none',   label: 'Không', emoji: '—'  },
+                  { key: 'lift',   label: 'Lift',   emoji: '⬆'  },
+                  { key: 'bounce', label: 'Bounce', emoji: '↕'  },
+                  { key: 'shake',  label: 'Shake',  emoji: '↔'  },
+                  { key: 'pulse',  label: 'Pulse',  emoji: '◎'  },
+                  { key: 'glow',   label: 'Glow',   emoji: '✦'  },
+                ] as const).map(a => (
+                  <button key={a.key} onClick={() => set('linkAnimation', a.key)}
+                    className={`flex items-center justify-center gap-1.5 py-2 rounded-xl border-2 text-xs font-semibold transition-all ${
+                      (settings.linkAnimation ?? 'none') === a.key ? 'border-[#333A2F] bg-[#EBEDDF] text-[#333A2F]' : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}>
+                    <span>{a.emoji}</span>{a.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-700 font-medium">Nút lưu liên hệ (VCard)</p>
+              <Toggle on={settings.vcardEnabled ?? false} onChange={() => set('vcardEnabled', !(settings.vcardEnabled ?? false))} />
+            </div>
+            <p className="text-xs text-gray-400 -mt-2">Hiển thị nút "Lưu liên hệ" trên trang public để khách tải VCard.</p>
           </section>
 
           {/* ── Products ── */}
@@ -737,6 +764,42 @@ export default function AppearanceTab() {
               <p className="text-sm text-gray-700 font-medium">Show description</p>
               <Toggle on={settings.productShowDesc} onChange={() => set('productShowDesc', !settings.productShowDesc)} />
             </div>
+          </section>
+
+          {/* ── Custom CSS (Pro) ── */}
+          <section className={`bg-white rounded-2xl border border-gray-200 p-5 space-y-3 relative ${!isPro ? 'overflow-hidden' : ''}`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-bold text-gray-800">Custom CSS</p>
+                <p className="text-xs text-gray-400 mt-0.5">Tùy chỉnh style trang bằng CSS của bạn.</p>
+              </div>
+              {!isPro && (
+                <span className="flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full font-bold">
+                  <Crown size={10} /> PRO
+                </span>
+              )}
+            </div>
+            {isPro ? (
+              <>
+                <textarea
+                  value={settings.customCss ?? ''}
+                  onChange={e => set('customCss', e.target.value)}
+                  placeholder={`.link-btn {\n  border-radius: 999px;\n}\n\n.page-bg {\n  opacity: 0.9;\n}`}
+                  rows={8}
+                  spellCheck={false}
+                  className="w-full px-3.5 py-3 rounded-xl border border-gray-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#333A2F] resize-y bg-gray-50 text-gray-700"
+                />
+                <p className="text-[11px] text-gray-400">Áp dụng trực tiếp vào trang public. Target class: <code className="bg-gray-100 px-1 rounded">.link-btn</code>, <code className="bg-gray-100 px-1 rounded">.page-bg</code></p>
+              </>
+            ) : (
+              <div
+                className="absolute inset-0 bg-white/80 backdrop-blur-[2px] rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer"
+                onClick={() => setShowUpgrade('Custom CSS')}
+              >
+                <Crown size={22} className="text-amber-500" />
+                <p className="text-sm font-semibold text-gray-700">Nâng cấp PRO để dùng Custom CSS</p>
+              </div>
+            )}
           </section>
 
         </div>

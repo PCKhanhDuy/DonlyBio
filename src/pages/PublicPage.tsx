@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ExternalLink, Globe, Link2, Share2, Check, X as XIcon, Mail, Copy, Briefcase, Star, Heart, CalendarDays, ImageOff, ShoppingBag, SearchX, ChevronRight } from 'lucide-react'
+import { ExternalLink, Globe, Link2, Share2, Check, X as XIcon, Mail, Copy, Briefcase, Star, Heart, CalendarDays, ImageOff, ShoppingBag, SearchX, ChevronRight, Music, MessageSquare, Send } from 'lucide-react'
 import {
   SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiX, SiShopee,
   SiGithub, SiTelegram, SiWhatsapp, SiMessenger, SiZalo,
@@ -173,6 +173,11 @@ export default function PublicPage() {
 
   return (
     <>
+      {/* Custom CSS injection */}
+      {settings.customCss && (
+        <style dangerouslySetInnerHTML={{ __html: settings.customCss }} />
+      )}
+
       <div className="hidden md:block fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
         <div style={blurBgStyle} />
         <div className="absolute inset-0 bg-black/10" />
@@ -299,10 +304,14 @@ function LinkBtn({ link, tpl, align = 'center', settings, userId }: {
     </span>
   )
 
+  const animClass = settings.linkAnimation && settings.linkAnimation !== 'none'
+    ? `link-anim-${settings.linkAnimation}`
+    : ''
+
   return (
     <a href={link.url} target="_blank" rel="noreferrer"
       onClick={() => userId && trackClick(link.id, userId)}
-      className="flex items-center gap-3 w-full text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg relative"
+      className={`link-btn flex items-center gap-3 w-full text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg relative ${animClass}`}
       style={{ background: bg, border, color, padding, borderRadius: settings.linkRadius + 'px', boxShadow, backdropFilter: 'blur(8px)' }}>
       {/* Thumbnail takes priority over icon */}
       {link.thumbnail_url ? (
@@ -723,12 +732,157 @@ function EmailCaptureBlock({ profile, tpl, dark }: { profile: Profile; tpl: Temp
   )
 }
 
-// ─── Extras section (tip jar + booking + email capture) ───────────────────────
-function ExtrasSection({ profile, tpl, dark }: { profile: Profile; tpl: TemplateStyle; dark?: boolean }) {
-  const hasTip     = !!profile.tip_url
-  const hasBooking = !!profile.booking_url
-  const hasEmail   = !!profile.email_capture_enabled
-  if (!hasTip && !hasBooking && !hasEmail) return null
+// ─── Music player widget ──────────────────────────────────────────────────────
+function MusicPlayerWidget({ settings, tpl }: { settings: CustomSettings; tpl: TemplateStyle }) {
+  const url = settings.musicWidgetUrl
+  if (!url) return null
+  const spotifyEmbed = getSpotifyEmbed(url)
+  if (spotifyEmbed) {
+    return (
+      <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${tpl.cardBorder}` }}>
+        <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold"
+          style={{ background: tpl.cardBg, color: tpl.subtextColor }}>
+          <Music size={12} /> Music
+        </div>
+        <iframe src={spotifyEmbed} width="100%" height="152" frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy" style={{ display: 'block' }} />
+      </div>
+    )
+  }
+  const ytId = getYoutubeId(url)
+  if (ytId) {
+    return (
+      <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${tpl.cardBorder}` }}>
+        <iframe src={`https://www.youtube.com/embed/${ytId}?modestbranding=1&rel=0`}
+          width="100%" height="200" frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen loading="lazy" style={{ display: 'block' }} />
+      </div>
+    )
+  }
+  return null
+}
+
+// ─── Testimonials block ───────────────────────────────────────────────────────
+function TestimonialsBlock({ profile, tpl }: { profile: Profile; tpl: TemplateStyle }) {
+  const [items, setItems] = useState<Array<{
+    id: string; author_name: string; author_role: string | null; content: string; rating: number
+  }>>([])
+
+  useEffect(() => {
+    supabase.from('testimonials').select('id,author_name,author_role,content,rating')
+      .eq('user_id', profile.id).eq('is_active', true).order('sort_order')
+      .then(({ data }) => setItems(data ?? []))
+  }, [profile.id])
+
+  if (items.length === 0) return null
+
+  return (
+    <div className="space-y-2.5">
+      <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: tpl.subtextColor }}>
+        Reviews
+      </p>
+      {items.map(t => (
+        <div key={t.id} className="p-4 rounded-2xl space-y-2"
+          style={{ background: tpl.cardBg, border: `1px solid ${tpl.cardBorder}` }}>
+          <div className="flex gap-0.5">
+            {[1, 2, 3, 4, 5].map(n => (
+              <Star key={n} size={11} fill={n <= t.rating ? '#f59e0b' : 'none'}
+                style={{ color: n <= t.rating ? '#f59e0b' : tpl.subtextColor + '40' }} />
+            ))}
+          </div>
+          <p className="text-sm leading-relaxed italic" style={{ color: tpl.textColor }}>"{t.content}"</p>
+          <div>
+            <p className="text-xs font-semibold" style={{ color: tpl.textColor }}>{t.author_name}</p>
+            {t.author_role && <p className="text-[11px]" style={{ color: tpl.subtextColor }}>{t.author_role}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ─── Contact form block ───────────────────────────────────────────────────────
+function ContactFormBlock({ profile, tpl, dark }: { profile: Profile; tpl: TemplateStyle; dark?: boolean }) {
+  const [name, setName]       = useState('')
+  const [email, setEmail]     = useState('')
+  const [msg, setMsg]         = useState('')
+  const [status, setStatus]   = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || !msg.trim()) return
+    setStatus('sending')
+    const { error } = await supabase.from('contact_messages').insert({
+      user_id: profile.id,
+      sender_name: name.trim(),
+      sender_email: email.trim() || null,
+      message: msg.trim(),
+    })
+    if (error) { setStatus('error'); setTimeout(() => setStatus('idle'), 3000); return }
+    setStatus('done')
+    setName(''); setEmail(''); setMsg('')
+  }
+
+  const cardBg    = dark ? 'rgba(255,255,255,0.08)' : tpl.cardBg
+  const cardBord  = dark ? 'rgba(255,255,255,0.15)' : tpl.cardBorder
+  const textColor = dark ? '#fff' : tpl.textColor
+  const subColor  = dark ? 'rgba(255,255,255,0.6)' : tpl.subtextColor
+  const inputSt: React.CSSProperties = {
+    background: dark ? 'rgba(255,255,255,0.06)' : tpl.cardBg,
+    border: `1px solid ${dark ? 'rgba(255,255,255,0.18)' : tpl.cardBorder}`,
+    color: textColor,
+  }
+
+  if (status === 'done') return (
+    <div className="text-center py-5 px-4 rounded-2xl" style={{ background: cardBg, border: `1px solid ${cardBord}` }}>
+      <p className="text-sm font-semibold" style={{ color: textColor }}>✓ Đã gửi!</p>
+      <p className="text-xs mt-0.5" style={{ color: subColor }}>Cảm ơn bạn đã liên hệ.</p>
+    </div>
+  )
+
+  return (
+    <div className="p-4 rounded-2xl space-y-3" style={{ background: cardBg, border: `1px solid ${cardBord}` }}>
+      <div className="flex items-center gap-2">
+        <MessageSquare size={14} style={{ color: subColor }} />
+        <p className="text-sm font-semibold" style={{ color: textColor }}>Gửi tin nhắn</p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <input value={name} onChange={e => setName(e.target.value)} required
+          placeholder="Tên của bạn *"
+          className="w-full px-3 py-2 text-sm rounded-xl focus:outline-none placeholder-gray-400"
+          style={inputSt} />
+        <input value={email} onChange={e => setEmail(e.target.value)} type="email"
+          placeholder="Email (tuỳ chọn)"
+          className="w-full px-3 py-2 text-sm rounded-xl focus:outline-none placeholder-gray-400"
+          style={inputSt} />
+        <textarea value={msg} onChange={e => setMsg(e.target.value)} required
+          placeholder="Tin nhắn của bạn…" rows={3}
+          className="w-full px-3 py-2 text-sm rounded-xl focus:outline-none resize-none placeholder-gray-400"
+          style={inputSt} />
+        <button type="submit" disabled={status === 'sending'}
+          className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl text-white transition-all hover:opacity-90 disabled:opacity-50"
+          style={{ background: '#333A2F' }}>
+          <Send size={13} />
+          {status === 'sending' ? 'Đang gửi…' : 'Gửi'}
+        </button>
+      </form>
+      {status === 'error' && <p className="text-xs text-red-500">Có lỗi xảy ra. Vui lòng thử lại.</p>}
+    </div>
+  )
+}
+
+// ─── Extras section (music + testimonials + contact + tip jar + booking + email + vcard) ──
+function ExtrasSection({ profile, tpl, dark, settings }: { profile: Profile; tpl: TemplateStyle; dark?: boolean; settings?: CustomSettings }) {
+  const hasTip        = !!profile.tip_url
+  const hasBooking    = !!profile.booking_url
+  const hasEmail      = !!profile.email_capture_enabled
+  const hasVcard      = !!settings?.vcardEnabled
+  const hasMusic      = !!settings?.musicWidgetUrl
+  const hasContact    = !!settings?.contactFormEnabled
+  const hasTestimonials = !!settings?.testimonialsEnabled
+  if (!hasTip && !hasBooking && !hasEmail && !hasVcard && !hasMusic && !hasContact && !hasTestimonials) return null
 
   const btnStyle: React.CSSProperties = dark
     ? { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff' }
@@ -736,6 +890,8 @@ function ExtrasSection({ profile, tpl, dark }: { profile: Profile; tpl: Template
 
   return (
     <div className="space-y-2.5">
+      {hasMusic  && settings && <MusicPlayerWidget settings={settings} tpl={tpl} />}
+      {hasTestimonials && <TestimonialsBlock profile={profile} tpl={tpl} />}
       {(hasTip || hasBooking) && (
         <div className="flex gap-2.5">
           {hasTip && (
@@ -754,8 +910,53 @@ function ExtrasSection({ profile, tpl, dark }: { profile: Profile; tpl: Template
           )}
         </div>
       )}
-      {hasEmail && <EmailCaptureBlock profile={profile} tpl={tpl} dark={dark} />}
+      {hasEmail  && <EmailCaptureBlock profile={profile} tpl={tpl} dark={dark} />}
+      {hasVcard  && settings && <VCardBtn profile={profile} tpl={tpl} settings={settings} />}
+      {hasContact && <ContactFormBlock profile={profile} tpl={tpl} dark={dark} />}
     </div>
+  )
+}
+
+// ─── VCard download button ────────────────────────────────────────────────────
+function VCardBtn({ profile, tpl, settings }: { profile: Profile; tpl: TemplateStyle; settings: CustomSettings }) {
+  if (!settings.vcardEnabled) return null
+
+  const download = () => {
+    const lines = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      `FN:${profile.display_name || profile.username || ''}`,
+      `NICKNAME:${profile.username || ''}`,
+      profile.job_title ? `TITLE:${profile.job_title}` : '',
+      profile.bio ? `NOTE:${profile.bio.replace(/\n/g, '\\n')}` : '',
+      `URL;type=HOMEPAGE:${window.location.href}`,
+      profile.avatar_url ? `PHOTO;VALUE=URL:${profile.avatar_url}` : '',
+      'END:VCARD',
+    ].filter(Boolean).join('\r\n')
+
+    const blob = new Blob([lines], { type: 'text/vcard' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `${profile.username || 'contact'}.vcf`
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
+  const btnStyle: React.CSSProperties = {
+    background: tpl.btnBg,
+    border: `1px solid ${tpl.btnBorder}`,
+    color: tpl.btnText,
+  }
+
+  return (
+    <button
+      onClick={download}
+      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+      style={btnStyle}
+    >
+      <Copy size={14} />
+      Lưu liên hệ
+    </button>
   )
 }
 
@@ -876,7 +1077,7 @@ function CenteredLayout({ profile, links, products, albums, tpl, settings, onAlb
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -901,7 +1102,7 @@ function LeftLayout({ profile, links, products, albums, tpl, settings, onAlbum }
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -931,7 +1132,7 @@ function HeroLayout({ profile, links, products, albums, tpl, pageBg, settings, o
         )}
         <ProductsGrid products={products} tpl={tpl} settings={settings} />
         <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-        <ExtrasSection profile={profile} tpl={tpl} />
+        <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
         <FooterTag tpl={tpl} />
       </div>
     </div>
@@ -991,7 +1192,7 @@ function GridLayout({ profile, links, products, albums, tpl, settings, onAlbum }
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -1027,7 +1228,7 @@ function CardLayout({ profile, links, products, albums, tpl, settings, onAlbum }
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -1054,7 +1255,7 @@ function SplitLayout({ profile, links, products, albums, tpl, pageBg, settings, 
         )}
         <ProductsGrid products={products} tpl={tpl} settings={settings} />
         <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-        <ExtrasSection profile={profile} tpl={tpl} />
+        <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
         <FooterTag tpl={tpl} />
       </div>
     </div>
@@ -1092,7 +1293,7 @@ function MagazineLayout({ profile, links, products, albums, tpl, bgImage, settin
         )}
         <ProductsGrid products={products} tpl={tpl} settings={settings} />
         <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-        <ExtrasSection profile={profile} tpl={tpl} />
+        <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
         <FooterTag tpl={tpl} />
       </div>
     </div>
@@ -1142,7 +1343,7 @@ function OverlayLayout({ profile, links, products, albums, tpl, bgImage, pageBg,
         )}
         <ProductsGrid products={products} tpl={darkTpl} settings={settings} />
         <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-        <ExtrasSection profile={profile} tpl={tpl} dark />
+        <ExtrasSection profile={profile} tpl={tpl} dark settings={settings} />
         <p className="text-center text-xs pt-6 pb-4 text-white/30">Made with DONLY ✦</p>
       </div>
     </div>
@@ -1192,7 +1393,7 @@ function CompactLayout({ profile, links, products, albums, tpl, settings, onAlbu
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -1230,7 +1431,7 @@ function BannerLayout({ profile, links, products, albums, tpl, bgImage, settings
         )}
         <ProductsGrid products={products} tpl={tpl} settings={settings} />
         <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-        <ExtrasSection profile={profile} tpl={tpl} />
+        <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
         <FooterTag tpl={tpl} />
       </div>
     </div>
@@ -1285,7 +1486,7 @@ function BubbleLayout({ profile, links, products, albums, tpl, settings, onAlbum
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -1325,7 +1526,7 @@ function FloatLayout({ profile, links, products, albums, tpl, bgImage, pageBg, s
             )}
             <ProductsGrid products={products} tpl={tpl} settings={settings} />
             <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-            <ExtrasSection profile={profile} tpl={tpl} />
+            <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
             <FooterTag tpl={tpl} />
           </div>
         </div>
@@ -1368,7 +1569,7 @@ function ColumnsLayout({ profile, links, products, albums, tpl, settings, onAlbu
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -1420,7 +1621,7 @@ function SpotlightLayout({ profile, links, products, albums, tpl, settings, onAl
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -1474,7 +1675,7 @@ function BentoLayout({ profile, links, products, albums, tpl, settings, onAlbum 
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -1514,7 +1715,7 @@ function TimelineLayout({ profile, links, products, albums, tpl, settings, onAlb
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -1568,7 +1769,7 @@ function StripLayout({ profile, links, products, albums, tpl, settings, onAlbum 
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
@@ -1611,7 +1812,7 @@ function ResumeLayout({ profile, links, products, albums, tpl, settings, onAlbum
         )}
         <ProductsGrid products={products} tpl={tpl} settings={settings} />
         <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-        <ExtrasSection profile={profile} tpl={tpl} />
+        <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
         <FooterTag tpl={tpl} />
       </div>
     </div>
@@ -1664,7 +1865,7 @@ function MasonryLayout({ profile, links, products, albums, tpl, settings, onAlbu
       )}
       <ProductsGrid products={products} tpl={tpl} settings={settings} />
       <AlbumRow albums={albums} tpl={tpl} onOpen={onAlbum} />
-      <ExtrasSection profile={profile} tpl={tpl} />
+      <ExtrasSection profile={profile} tpl={tpl} settings={settings} />
       <FooterTag tpl={tpl} />
     </div>
   )
