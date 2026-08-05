@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Plus, Trash2, ToggleLeft, ToggleRight, Link2, Pencil, X, Check, Globe,
-  GripVertical, Heading1, Star, Calendar, Image as ImageIcon, Clock, Type, Timer } from 'lucide-react'
+  GripVertical, Heading1, Star, Calendar, Image as ImageIcon, Clock, Type, Timer, BarChart2 } from 'lucide-react'
 import {
   SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiX, SiShopee,
   SiGithub, SiTelegram, SiWhatsapp, SiMessenger, SiZalo,
@@ -60,8 +60,11 @@ const BLOCK_TYPES: { id: BlockType; label: string; icon: React.ElementType; colo
   { id: 'heading',   label: 'Heading',       icon: Heading1,    color: '#6366F1', desc: 'Tiêu đề phân cách' },
   { id: 'text',      label: 'Text',          icon: Type,        color: '#64748b', desc: 'Đoạn văn bản' },
   { id: 'image',     label: 'Image',         icon: ImageIcon,   color: '#0ea5e9', desc: 'Ảnh full-width' },
-  { id: 'countdown', label: 'Countdown',     icon: Timer,       color: '#f97316', desc: 'Đồng hồ đếm ngược' },
-  { id: 'github',    label: 'GitHub Stats',  icon: SiGithub,   color: '#24292e', desc: 'GitHub profile card' },
+  { id: 'countdown',    label: 'Countdown',       icon: Timer,      color: '#f97316', desc: 'Đồng hồ đếm ngược' },
+  { id: 'github',       label: 'GitHub Stats',    icon: SiGithub,   color: '#24292e', desc: 'GitHub profile card' },
+  { id: 'poll',         label: 'Poll / Vote',     icon: BarChart2,  color: '#8b5cf6', desc: 'Bình chọn tương tác' },
+  { id: 'youtube_feed', label: 'YouTube Channel', icon: SiYoutube,  color: '#FF0000', desc: 'Video mới nhất' },
+  { id: 'twitter',      label: 'Tweet Card',      icon: SiX,        color: '#14171A', desc: 'Nhúng tweet/post' },
 ]
 
 function getBlockMeta(bt: BlockType | null) {
@@ -170,7 +173,7 @@ function AddBlockForm({ linksCount, onSaved, onCancel }: {
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
     const needsUrl = !['heading', 'text'].includes(blockType)
-    const needsTitle = blockType === 'text'
+    const needsTitle = ['text', 'poll'].includes(blockType)
     if (needsUrl && !form.url) return
     if (needsTitle && !form.title) return
     setSaving(true)
@@ -186,12 +189,15 @@ function AddBlockForm({ linksCount, onSaved, onCancel }: {
   }
 
   const urlPlaceholder: Record<string, string> = {
-    youtube:   'https://www.youtube.com/watch?v=...',
-    spotify:   'https://open.spotify.com/track/...',
-    instagram: 'https://www.instagram.com/p/...',
-    tiktok:    'https://www.tiktok.com/@user/video/...',
-    image:     'https://example.com/image.jpg',
-    countdown: '',
+    youtube:      'https://www.youtube.com/watch?v=...',
+    spotify:      'https://open.spotify.com/track/...',
+    instagram:    'https://www.instagram.com/p/...',
+    tiktok:       'https://www.tiktok.com/@user/video/...',
+    image:        'https://example.com/image.jpg',
+    countdown:    '',
+    twitter:      'https://x.com/user/status/...',
+    youtube_feed: 'https://www.youtube.com/@channelname',
+    poll:         '',
   }
 
   return (
@@ -230,7 +236,17 @@ function AddBlockForm({ linksCount, onSaved, onCancel }: {
             </div>
           </>
         )}
-        {!['heading', 'text', 'countdown'].includes(blockType) && (
+        {blockType === 'poll' && (
+          <>
+            <input type="text" placeholder="Câu hỏi bình chọn" value={form.title} required onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className={INPUT} />
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Các lựa chọn (phân cách bằng dấu phẩy)</label>
+              <input type="text" placeholder="Lựa chọn A, Lựa chọn B, Lựa chọn C" value={form.url} required onChange={e => setForm(f => ({ ...f, url: e.target.value }))} className={INPUT} />
+              <p className="text-[10px] text-gray-400 mt-1">Nhập các phương án, cách nhau bằng dấu phẩy</p>
+            </div>
+          </>
+        )}
+        {!['heading', 'text', 'countdown', 'poll'].includes(blockType) && (
           <>
             <input type="url" placeholder={urlPlaceholder[blockType] || 'https://...'} value={form.url} required onChange={e => setForm(f => ({ ...f, url: e.target.value }))} className={INPUT} />
             <input type="text" placeholder="Tiêu đề (tùy chọn)" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className={INPUT} />

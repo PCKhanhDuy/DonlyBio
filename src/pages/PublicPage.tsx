@@ -635,20 +635,136 @@ function GithubBlock({ link, tpl }: { link: BioLink; tpl: TemplateStyle }) {
   )
 }
 
+// ─── Poll block ───────────────────────────────────────────────────────────────
+function PollBlock({ link, tpl }: { link: BioLink; tpl: TemplateStyle }) {
+  const options = (link.url || '').split(',').map(s => s.trim()).filter(Boolean)
+  const FINGERPRINT_KEY = `donly_poll_${link.id}`
+  const [voted, setVoted] = useState<number | null>(() => {
+    const v = localStorage.getItem(FINGERPRINT_KEY)
+    return v !== null ? parseInt(v) : null
+  })
+  const [counts, setCounts] = useState<number[]>(options.map(() => 0))
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase.from('poll_votes').select('option_index').eq('link_id', link.id)
+      .then(({ data }) => {
+        if (data) {
+          const c = options.map(() => 0)
+          data.forEach(v => { if (c[v.option_index] !== undefined) c[v.option_index]++ })
+          setCounts(c)
+        }
+        setLoading(false)
+      })
+  }, [link.id])
+
+  const vote = async (idx: number) => {
+    if (voted !== null) return
+    const fp = Math.random().toString(36).slice(2)
+    const existingFp = localStorage.getItem(FINGERPRINT_KEY + '_fp') || fp
+    localStorage.setItem(FINGERPRINT_KEY + '_fp', existingFp)
+    const { error } = await supabase.from('poll_votes').insert({
+      link_id: link.id, option_index: idx, voter_fingerprint: existingFp,
+    })
+    if (!error) {
+      localStorage.setItem(FINGERPRINT_KEY, String(idx))
+      setVoted(idx)
+      setCounts(c => c.map((n, i) => i === idx ? n + 1 : n))
+    }
+  }
+
+  const total = counts.reduce((s, n) => s + n, 0)
+
+  return (
+    <div className="p-4 rounded-2xl space-y-3" style={{ background: tpl.cardBg, border: `1px solid ${tpl.cardBorder}` }}>
+      {link.title && <p className="text-sm font-bold" style={{ color: tpl.textColor }}>{link.title}</p>}
+      {loading ? (
+        <div className="space-y-2">
+          {options.map((_, i) => <div key={i} className="h-9 rounded-xl animate-pulse" style={{ background: tpl.cardBorder + '60' }} />)}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {options.map((opt, i) => {
+            const pct = total > 0 ? Math.round((counts[i] / total) * 100) : 0
+            const isWinner = voted !== null && counts[i] === Math.max(...counts)
+            return (
+              <button key={i} onClick={() => vote(i)} disabled={voted !== null}
+                className="relative w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium overflow-hidden transition-all hover:scale-[1.01] disabled:cursor-default"
+                style={{ border: `1px solid ${voted === i ? '#5B6AD0' : tpl.cardBorder}`, color: tpl.textColor }}>
+                {voted !== null && (
+                  <div className="absolute inset-0 rounded-xl transition-all"
+                    style={{ width: pct + '%', background: isWinner ? 'rgba(91,106,208,0.18)' : tpl.cardBorder + '60' }} />
+                )}
+                <span className="relative flex items-center justify-between">
+                  <span>{opt}</span>
+                  {voted !== null && <span className="text-xs font-bold opacity-70">{pct}%</span>}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      )}
+      <p className="text-[10px] text-center" style={{ color: tpl.subtextColor }}>{total} {total === 1 ? 'vote' : 'votes'}</p>
+    </div>
+  )
+}
+
+// ─── YouTube channel block ────────────────────────────────────────────────────
+function YoutubeChannelBlock({ link, tpl }: { link: BioLink; tpl: TemplateStyle }) {
+  const handle = link.url.replace(/^https?:\/\/(www\.)?youtube\.com\//, '').replace(/\/$/, '') || link.url
+  return (
+    <a href={link.url} target="_blank" rel="noreferrer"
+      className="flex items-center gap-3 p-4 rounded-2xl transition-all hover:scale-[1.01] active:scale-[0.99]"
+      style={{ background: tpl.cardBg, border: `1px solid ${tpl.cardBorder}` }}>
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#FF000018' }}>
+        <SiYoutube size={22} style={{ color: '#FF0000' }} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5" style={{ color: tpl.subtextColor }}>YouTube</p>
+        <p className="text-sm font-semibold truncate" style={{ color: tpl.textColor }}>{link.title || handle}</p>
+      </div>
+      <span className="flex-shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-full text-white" style={{ background: '#FF0000' }}>
+        Subscribe
+      </span>
+    </a>
+  )
+}
+
+// ─── Twitter / X card block ───────────────────────────────────────────────────
+function TwitterBlock({ link, tpl }: { link: BioLink; tpl: TemplateStyle }) {
+  return (
+    <a href={link.url} target="_blank" rel="noreferrer"
+      className="flex items-center gap-3 p-4 rounded-2xl transition-all hover:scale-[1.01] active:scale-[0.99]"
+      style={{ background: tpl.cardBg, border: `1px solid ${tpl.cardBorder}` }}>
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#14171A18' }}>
+        <SiX size={18} style={{ color: tpl.textColor }} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5" style={{ color: tpl.subtextColor }}>X / Twitter</p>
+        <p className="text-sm font-semibold truncate" style={{ color: tpl.textColor }}>{link.title || 'View Post'}</p>
+      </div>
+      <ExternalLink size={13} style={{ color: tpl.subtextColor, opacity: 0.6, flexShrink: 0 }} />
+    </a>
+  )
+}
+
 function BlockOrLink({ link, tpl, settings, userId, align }: {
   link: BioLink; tpl: TemplateStyle; settings: CustomSettings; userId: string; align?: 'center' | 'left'
 }) {
   switch (link.block_type) {
-    case 'heading':   return <HeadingBlock link={link} tpl={tpl} />
-    case 'youtube':   return <YoutubeBlock link={link} tpl={tpl} />
-    case 'spotify':   return <SpotifyBlock link={link} tpl={tpl} />
+    case 'heading':      return <HeadingBlock link={link} tpl={tpl} />
+    case 'youtube':      return <YoutubeBlock link={link} tpl={tpl} />
+    case 'spotify':      return <SpotifyBlock link={link} tpl={tpl} />
     case 'instagram':
-    case 'tiktok':    return <SocialPostBlock link={link} tpl={tpl} />
-    case 'text':      return <TextBlock link={link} tpl={tpl} />
-    case 'image':     return <ImageBlock link={link} tpl={tpl} settings={settings} />
-    case 'countdown': return <CountdownBlock link={link} tpl={tpl} />
-    case 'github':    return <GithubBlock link={link} tpl={tpl} />
-    default:          return <LinkBtn link={link} tpl={tpl} settings={settings} userId={userId} align={align} />
+    case 'tiktok':       return <SocialPostBlock link={link} tpl={tpl} />
+    case 'text':         return <TextBlock link={link} tpl={tpl} />
+    case 'image':        return <ImageBlock link={link} tpl={tpl} settings={settings} />
+    case 'countdown':    return <CountdownBlock link={link} tpl={tpl} />
+    case 'github':       return <GithubBlock link={link} tpl={tpl} />
+    case 'poll':         return <PollBlock link={link} tpl={tpl} />
+    case 'youtube_feed': return <YoutubeChannelBlock link={link} tpl={tpl} />
+    case 'twitter':      return <TwitterBlock link={link} tpl={tpl} />
+    default:             return <LinkBtn link={link} tpl={tpl} settings={settings} userId={userId} align={align} />
   }
 }
 

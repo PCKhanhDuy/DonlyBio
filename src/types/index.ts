@@ -42,6 +42,30 @@ export interface CustomSettings {
   // Page password protection (Pro)
   pagePasswordEnabled?: boolean
   pagePassword?: string
+  // Background gradient/image
+  pageBgGradient?: string
+  pageBgImage?: string
+}
+
+// ─── Notification ──────────────────────────────────────────────────────────────
+export interface AppNotification {
+  id: string
+  user_id: string
+  type: 'contact_message' | 'email_subscribe' | 'milestone'
+  title: string
+  body?: string
+  is_read: boolean
+  created_at: string
+}
+
+// ─── Bio page (multi-page) ─────────────────────────────────────────────────────
+export interface BioPage {
+  id: string
+  user_id: string
+  title: string
+  slug: string
+  is_default: boolean
+  created_at: string
 }
 
 export const DEFAULT_SETTINGS: CustomSettings = {
@@ -89,7 +113,7 @@ export type Profile = {
   plan: 'free' | 'pro' | null
 }
 
-export type BlockType = 'link' | 'youtube' | 'spotify' | 'instagram' | 'tiktok' | 'heading' | 'text' | 'image' | 'countdown' | 'github'
+export type BlockType = 'link' | 'youtube' | 'spotify' | 'instagram' | 'tiktok' | 'heading' | 'text' | 'image' | 'countdown' | 'github' | 'poll' | 'youtube_feed' | 'twitter'
 
 export type BioLink = {
   id: string

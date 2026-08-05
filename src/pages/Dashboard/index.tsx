@@ -11,6 +11,7 @@ import SettingsTab from './SettingsTab'
 import ExtrasTab from './ExtrasTab'
 import AnalyticsTab from './AnalyticsTab'
 import OverviewTab from './OverviewTab'
+import { useNotifications, NotificationBell, NotificationPanel } from './NotificationPanel'
 
 type Tab = 'overview' | 'links' | 'products' | 'photos' | 'appearance' | 'settings' | 'extras' | 'analytics'
 
@@ -227,6 +228,8 @@ export default function Dashboard() {
   })
   const [copied, setCopied] = useState(false)
   const [showPreview, setShowPreview] = useState(true)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const { notifications, unread, markAllRead, markRead } = useNotifications()
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -280,6 +283,7 @@ export default function Dashboard() {
             {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} className="text-gray-400" />}
           </button>
         </div>
+        <NotificationBell onClick={() => setNotifOpen(true)} unread={unread} />
         <a href={publicUrl} target="_blank" rel="noreferrer"
           className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition-colors"
           style={{ background: '#333A2F' }}>
@@ -299,6 +303,7 @@ export default function Dashboard() {
               <p className="text-xs text-gray-400 mt-0.5">{window.location.host}/u/{profile.username}</p>
             </div>
             <div className="flex items-center gap-2">
+              <NotificationBell onClick={() => setNotifOpen(true)} unread={unread} />
               <button onClick={copyLink}
                 className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 transition-all">
                 {copied ? <><Check size={15} className="text-green-500" /> Copied!</> : <><Copy size={15} /> Copy Link</>}
@@ -336,6 +341,15 @@ export default function Dashboard() {
           </aside>
         )}
       </div>
+
+      <NotificationPanel
+        open={notifOpen}
+        onClose={() => setNotifOpen(false)}
+        notifications={notifications}
+        unread={unread}
+        markAllRead={markAllRead}
+        markRead={markRead}
+      />
     </div>
   )
 }
