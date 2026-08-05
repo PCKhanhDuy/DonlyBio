@@ -256,7 +256,7 @@ export default function Landing() {
                   Tạo trang miễn phí <ArrowRight size={15} />
                 </Link>
               </motion.div>
-              <Link to="/u/demo" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', fontSize: 15, color: 'rgba(255,255,255,.55)', fontWeight: 500, padding: '13px 20px', borderRadius: 12, border: '1px solid rgba(255,255,255,.1)', background: 'rgba(255,255,255,.04)' }}>
+              <Link to="/demo" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', fontSize: 15, color: 'rgba(255,255,255,.55)', fontWeight: 500, padding: '13px 20px', borderRadius: 12, border: '1px solid rgba(255,255,255,.1)', background: 'rgba(255,255,255,.04)' }}>
                 Xem demo →
               </Link>
             </div>

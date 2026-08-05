@@ -10,6 +10,7 @@ import EditorPage from './pages/Editor'
 import PublicPage from './pages/PublicPage'
 import Pricing from './pages/Pricing'
 import Landing from './pages/Landing'
+import Demo from './pages/Demo'
 import { useAuth } from './context/AuthContext'
 
 function HomeRoute() {
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/editor"    element={<ProtectedRoute><EditorPage /></ProtectedRoute>} />
           <Route path="/pricing"   element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
+          <Route path="/demo" element={<Demo />} />
           <Route path="/" element={<HomeRoute />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
