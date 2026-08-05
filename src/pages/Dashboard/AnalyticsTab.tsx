@@ -32,6 +32,7 @@ export default function AnalyticsTab() {
   const navigate = useNavigate()
   const [range, setRange] = useState<7 | 30 | 90>(7)
   const [views, setViews] = useState<{ date: string; count: number }[]>([])
+  const [clicksByDay, setClicksByDay] = useState<{ date: string; count: number }[]>([])
   const [clicks, setClicks] = useState<{ link_id: string; count: number }[]>([])
   const [links, setLinks] = useState<BioLink[]>([])
   const [loading, setLoading] = useState(true)
@@ -48,7 +49,7 @@ export default function AnalyticsTab() {
 
     const [{ data: vData }, { data: cData }, { data: lData }] = await Promise.all([
       supabase.from('page_views').select('viewed_at').eq('user_id', user!.id).gte('viewed_at', sinceStr),
-      supabase.from('link_clicks').select('link_id, clicked_at').eq('user_id', user!.id).gte('clicked_at', sinceStr),
+      supabase.from('link_clicks').select('link_id,clicked_at').eq('user_id', user!.id).gte('clicked_at', sinceStr),
       supabase.from('bio_links').select('*').eq('user_id', user!.id).order('sort_order'),
     ])
 
@@ -62,6 +63,15 @@ export default function AnalyticsTab() {
     })
     setViews(days.map(d => ({ date: d, count: viewMap[d] })))
     setTotalViews((vData ?? []).length)
+
+    // Group clicks by day
+    const clickDayMap: Record<string, number> = {}
+    days.forEach(d => { clickDayMap[d] = 0 })
+    ;(cData ?? []).forEach(c => {
+      const d = c.clicked_at.slice(0, 10)
+      if (clickDayMap[d] !== undefined) clickDayMap[d]++
+    })
+    setClicksByDay(days.map(d => ({ date: d, count: clickDayMap[d] })))
 
     // Group clicks by link_id
     const clickMap: Record<string, number> = {}
@@ -199,6 +209,49 @@ export default function AnalyticsTab() {
           <div className="flex justify-between mt-1">
             <span className="text-[10px] text-gray-400">{formatDate(views[0]?.date ?? '')}</span>
             <span className="text-[10px] text-gray-400">{formatDate(views[views.length - 1]?.date ?? '')}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Clicks chart */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-5">
+        <div className="flex items-center gap-2 mb-5">
+          <MousePointerClick size={16} className="text-gray-400" />
+          <h3 className="font-semibold text-gray-800 text-sm">Lượt click theo ngày</h3>
+        </div>
+        {loading ? (
+          <div className="h-32 flex items-center justify-center">
+            <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#333A2F', borderTopColor: 'transparent' }} />
+          </div>
+        ) : (
+          <div className="flex items-end gap-1 h-32">
+            {clicksByDay.map(v => {
+              const maxC = Math.max(...clicksByDay.map(x => x.count), 1)
+              return (
+                <div key={v.date} className="flex-1 flex flex-col items-center gap-1 group">
+                  <div className="w-full relative flex flex-col justify-end" style={{ height: '100px' }}>
+                    <div
+                      className="w-full rounded-t-sm transition-all duration-300 group-hover:opacity-80 relative"
+                      style={{ height: `${Math.max(4, (v.count / maxC) * 100)}%`, background: '#2563eb' }}>
+                      {v.count > 0 && (
+                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity pointer-events-none">
+                          {v.count}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {range <= 7 && (
+                    <span className="text-[9px] text-gray-400">{formatDate(v.date)}</span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+        {range === 30 && (
+          <div className="flex justify-between mt-1">
+            <span className="text-[10px] text-gray-400">{formatDate(clicksByDay[0]?.date ?? '')}</span>
+            <span className="text-[10px] text-gray-400">{formatDate(clicksByDay[clicksByDay.length - 1]?.date ?? '')}</span>
           </div>
         )}
       </div>

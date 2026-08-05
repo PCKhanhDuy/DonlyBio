@@ -39,6 +39,9 @@ export interface CustomSettings {
   contactFormEnabled?: boolean
   // Testimonials block
   testimonialsEnabled?: boolean
+  // Page password protection (Pro)
+  pagePasswordEnabled?: boolean
+  pagePassword?: string
 }
 
 export const DEFAULT_SETTINGS: CustomSettings = {
@@ -86,7 +89,7 @@ export type Profile = {
   plan: 'free' | 'pro' | null
 }
 
-export type BlockType = 'link' | 'youtube' | 'spotify' | 'instagram' | 'tiktok' | 'heading' | 'text' | 'image' | 'countdown'
+export type BlockType = 'link' | 'youtube' | 'spotify' | 'instagram' | 'tiktok' | 'heading' | 'text' | 'image' | 'countdown' | 'github'
 
 export type BioLink = {
   id: string

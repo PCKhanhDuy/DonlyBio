@@ -61,6 +61,7 @@ const BLOCK_TYPES: { id: BlockType; label: string; icon: React.ElementType; colo
   { id: 'text',      label: 'Text',          icon: Type,        color: '#64748b', desc: 'Đoạn văn bản' },
   { id: 'image',     label: 'Image',         icon: ImageIcon,   color: '#0ea5e9', desc: 'Ảnh full-width' },
   { id: 'countdown', label: 'Countdown',     icon: Timer,       color: '#f97316', desc: 'Đồng hồ đếm ngược' },
+  { id: 'github',    label: 'GitHub Stats',  icon: SiGithub,   color: '#24292e', desc: 'GitHub profile card' },
 ]
 
 function getBlockMeta(bt: BlockType | null) {

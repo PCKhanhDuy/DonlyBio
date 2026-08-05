@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ExternalLink, Globe, Link2, Share2, Check, X as XIcon, Mail, Copy, Briefcase, Star, Heart, CalendarDays, ImageOff, ShoppingBag, SearchX, ChevronRight, Music, MessageSquare, Send } from 'lucide-react'
+import { ExternalLink, Globe, Link2, Share2, Check, X as XIcon, Mail, Copy, Briefcase, Star, Heart, CalendarDays, ImageOff, ShoppingBag, SearchX, ChevronRight, Music, MessageSquare, Send, Lock } from 'lucide-react'
 import {
   SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiX, SiShopee,
   SiGithub, SiTelegram, SiWhatsapp, SiMessenger, SiZalo,
@@ -64,8 +64,17 @@ export default function PublicPage() {
   const [notFound, setNotFound] = useState(false)
   const [storyAlbum,  setStoryAlbum]  = useState<PhotoAlbum | null>(null)
   const [storyPhotos, setStoryPhotos] = useState<Photo[]>([])
+  // Page password gate state
+  const [pwInput,    setPwInput]    = useState('')
+  const [pwError,    setPwError]    = useState(false)
+  const [pwUnlocked, setPwUnlocked] = useState(false)
 
   useEffect(() => { if (username) load(username) }, [username])
+  useEffect(() => {
+    if (profile?.username) {
+      setPwUnlocked(sessionStorage.getItem(`donly_pw_${profile.username}`) === '1')
+    }
+  }, [profile?.username])
 
   const load = async (uname: string) => {
     const { data: p } = await supabase
@@ -158,6 +167,50 @@ export default function PublicPage() {
   const pageBg   = (rawBg && !isImgBg) ? rawBg : tpl.pageBg
   const settings: CustomSettings = { ...DEFAULT_SETTINGS, ...(profile!.custom_settings ?? {}) }
   const pageFont = FONTS[settings.pageFont]?.css ?? 'system-ui, -apple-system, sans-serif'
+
+  // Password gate
+  if (settings.pagePasswordEnabled && settings.pagePassword && !pwUnlocked) {
+    const checkPw = (e: React.FormEvent) => {
+      e.preventDefault()
+      if (pwInput === settings.pagePassword) {
+        sessionStorage.setItem(`donly_pw_${profile!.username}`, '1')
+        setPwUnlocked(true)
+      } else {
+        setPwError(true)
+        setTimeout(() => setPwError(false), 2000)
+      }
+    }
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: pageBg }}>
+        <div className="w-full max-w-xs p-8 rounded-3xl shadow-2xl space-y-5 text-center"
+          style={{ background: tpl.cardBg, border: `1px solid ${tpl.cardBorder}` }}>
+          {profile!.avatar_url && (
+            <img src={profile!.avatar_url} alt="" className="w-16 h-16 rounded-full mx-auto object-cover" />
+          )}
+          <div>
+            <h2 className="font-bold text-base" style={{ color: tpl.textColor }}>
+              {profile!.display_name || `@${profile!.username}`}
+            </h2>
+            <p className="text-xs mt-1 flex items-center justify-center gap-1.5" style={{ color: tpl.subtextColor }}>
+              <Lock size={11} /> Trang này được bảo vệ
+            </p>
+          </div>
+          <form onSubmit={checkPw} className="space-y-3">
+            <input type="password" value={pwInput} onChange={e => setPwInput(e.target.value)}
+              placeholder="Nhập mật khẩu…" required autoFocus
+              className="w-full px-4 py-2.5 rounded-xl text-sm text-center focus:outline-none"
+              style={{ background: tpl.btnBg, border: `1px solid ${pwError ? '#ef4444' : tpl.btnBorder}`, color: tpl.btnText }} />
+            {pwError && <p className="text-xs text-red-500">Mật khẩu không đúng</p>}
+            <button type="submit"
+              className="w-full py-2.5 text-sm font-semibold rounded-xl transition-all hover:opacity-90"
+              style={{ background: '#333A2F', color: '#fff' }}>
+              Mở khóa
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
 
   const shared: LayoutProps = {
     profile: profile!, links, products, albums, tpl, pageBg, bgImage, settings, onAlbum: openAlbum,
@@ -521,6 +574,67 @@ function CountdownBlock({ link, tpl }: { link: BioLink; tpl: TemplateStyle }) {
   )
 }
 
+// ─── GitHub stats block ───────────────────────────────────────────────────────
+function GithubBlock({ link, tpl }: { link: BioLink; tpl: TemplateStyle }) {
+  const [gh, setGh] = useState<{
+    name: string; login: string; bio: string | null;
+    avatar_url: string; followers: number; public_repos: number
+  } | null>(null)
+  const [err, setErr] = useState(false)
+
+  useEffect(() => {
+    const raw = link.url ?? ''
+    const username = raw.replace(/^https?:\/\/github\.com\//, '').replace(/\/.*$/, '').trim()
+    if (!username) { setErr(true); return }
+    fetch(`https://api.github.com/users/${username}`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(setGh)
+      .catch(() => setErr(true))
+  }, [link.url])
+
+  if (err) return (
+    <a href={link.url} target="_blank" rel="noreferrer"
+      className="flex items-center gap-3 p-4 rounded-2xl transition-all hover:scale-[1.01]"
+      style={{ background: tpl.cardBg, border: `1px solid ${tpl.cardBorder}` }}>
+      <SiGithub size={20} style={{ color: tpl.textColor }} />
+      <span className="text-sm font-semibold" style={{ color: tpl.textColor }}>{link.title || 'GitHub Profile'}</span>
+    </a>
+  )
+
+  if (!gh) return (
+    <div className="h-28 rounded-2xl animate-pulse" style={{ background: tpl.cardBg, border: `1px solid ${tpl.cardBorder}` }} />
+  )
+
+  return (
+    <div className="p-4 rounded-2xl space-y-3" style={{ background: tpl.cardBg, border: `1px solid ${tpl.cardBorder}` }}>
+      <div className="flex items-center gap-3">
+        <img src={gh.avatar_url} alt="" className="w-12 h-12 rounded-full flex-shrink-0 object-cover" />
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-sm truncate" style={{ color: tpl.textColor }}>{gh.name || gh.login}</p>
+          <p className="text-xs" style={{ color: tpl.subtextColor }}>@{gh.login}</p>
+        </div>
+        <SiGithub size={18} style={{ color: tpl.subtextColor, flexShrink: 0 }} />
+      </div>
+      {gh.bio && <p className="text-xs leading-relaxed" style={{ color: tpl.subtextColor }}>{gh.bio}</p>}
+      <div className="flex gap-5">
+        <div>
+          <p className="text-sm font-bold" style={{ color: tpl.textColor }}>{gh.followers.toLocaleString()}</p>
+          <p className="text-[10px] uppercase tracking-wide" style={{ color: tpl.subtextColor }}>followers</p>
+        </div>
+        <div>
+          <p className="text-sm font-bold" style={{ color: tpl.textColor }}>{gh.public_repos}</p>
+          <p className="text-[10px] uppercase tracking-wide" style={{ color: tpl.subtextColor }}>repos</p>
+        </div>
+      </div>
+      <a href={`https://github.com/${gh.login}`} target="_blank" rel="noreferrer"
+        className="flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-xl transition-all hover:scale-[1.02]"
+        style={{ background: tpl.btnBg, border: `1px solid ${tpl.btnBorder}`, color: tpl.btnText }}>
+        <SiGithub size={13} /> View on GitHub
+      </a>
+    </div>
+  )
+}
+
 function BlockOrLink({ link, tpl, settings, userId, align }: {
   link: BioLink; tpl: TemplateStyle; settings: CustomSettings; userId: string; align?: 'center' | 'left'
 }) {
@@ -533,6 +647,7 @@ function BlockOrLink({ link, tpl, settings, userId, align }: {
     case 'text':      return <TextBlock link={link} tpl={tpl} />
     case 'image':     return <ImageBlock link={link} tpl={tpl} settings={settings} />
     case 'countdown': return <CountdownBlock link={link} tpl={tpl} />
+    case 'github':    return <GithubBlock link={link} tpl={tpl} />
     default:          return <LinkBtn link={link} tpl={tpl} settings={settings} userId={userId} align={align} />
   }
 }

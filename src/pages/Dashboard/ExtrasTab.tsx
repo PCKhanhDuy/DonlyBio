@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Mail, Heart, Calendar, Save, Users, ToggleLeft, ToggleRight, Download, Search,
-  Music, MessageSquare, Star, Plus, Trash2, X, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react'
+  Music, MessageSquare, Star, Plus, Trash2, X, ChevronDown, ChevronUp, Eye, EyeOff, Lock, Crown } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { DEFAULT_SETTINGS } from '../../types'
 import type { CustomSettings } from '../../types'
+import { useNavigate } from 'react-router-dom'
 
 type Testimonial = {
   id: string
@@ -50,8 +51,9 @@ function StarRating({ value, onChange }: { value: number; onChange?: (n: number)
 }
 
 export default function ExtrasTab() {
-  const { user, profile, refreshProfile } = useAuth()
+  const { user, profile, refreshProfile, isPro } = useAuth()
   const { toast } = useToast()
+  const navigate = useNavigate()
 
   // Profile fields
   const [emailEnabled, setEmailEnabled] = useState(profile?.email_capture_enabled ?? false)
@@ -70,6 +72,9 @@ export default function ExtrasTab() {
   const [musicUrl, setMusicUrl]             = useState(initSettings.musicWidgetUrl ?? '')
   const [contactEnabled, setContactEnabled] = useState(initSettings.contactFormEnabled ?? false)
   const [testimonialsEnabled, setTestimonialsEnabled] = useState(initSettings.testimonialsEnabled ?? false)
+  const [pagePasswordEnabled, setPagePasswordEnabled] = useState(initSettings.pagePasswordEnabled ?? false)
+  const [pagePassword, setPagePassword]               = useState(initSettings.pagePassword ?? '')
+  const [showPassword, setShowPassword]               = useState(false)
 
   // Contact messages inbox
   const [messages, setMessages]     = useState<ContactMsg[]>([])
@@ -163,6 +168,8 @@ export default function ExtrasTab() {
       musicWidgetUrl: musicUrl || undefined,
       contactFormEnabled: contactEnabled,
       testimonialsEnabled: testimonialsEnabled,
+      pagePasswordEnabled: pagePasswordEnabled,
+      pagePassword: pagePassword || undefined,
     }
     await supabase.from('profiles').update({
       email_capture_enabled: emailEnabled,
@@ -186,6 +193,41 @@ export default function ExtrasTab() {
       <div>
         <h2 className="text-xl font-bold text-gray-900">Page Extras</h2>
         <p className="text-sm text-gray-500 mt-0.5">Add extra blocks to your public page.</p>
+      </div>
+
+      {/* Page Password (Pro) */}
+      <div className={`bg-white rounded-2xl border p-5 space-y-4 relative ${isPro ? 'border-gray-200' : 'border-gray-100'}`}>
+        {!isPro && (
+          <div className="absolute inset-0 bg-white/80 rounded-2xl z-10 flex flex-col items-center justify-center gap-2 cursor-pointer"
+            onClick={() => navigate('/pricing')}>
+            <Crown size={20} className="text-amber-500" />
+            <p className="text-xs font-semibold text-gray-600">Tính năng PRO</p>
+          </div>
+        )}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Lock size={16} className="text-gray-500" />
+            <h3 className="font-semibold text-gray-800 text-sm">Bảo vệ trang bằng mật khẩu</h3>
+          </div>
+          <Toggle on={pagePasswordEnabled} onChange={() => setPagePasswordEnabled(v => !v)} />
+        </div>
+        <p className="text-xs text-gray-400 -mt-2">Khách phải nhập đúng mật khẩu mới xem được trang của bạn.</p>
+        {pagePasswordEnabled && (
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={pagePassword}
+              onChange={e => setPagePassword(e.target.value)}
+              placeholder="Nhập mật khẩu…"
+              className={INPUT}
+            />
+            <button type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              onClick={() => setShowPassword(v => !v)}>
+              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Music Player Widget */}
