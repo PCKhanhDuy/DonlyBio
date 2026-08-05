@@ -1,367 +1,448 @@
 import { Link } from 'react-router-dom'
-import {
-  Check, Zap, ArrowRight, Star, BarChart2, Palette, Lock, Music,
-  MessageSquare, QrCode, Link2, Globe, Sparkles,
-} from 'lucide-react'
-import {
-  SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiSpotify,
-  SiGithub, SiTelegram, SiWhatsapp, SiX,
-} from 'react-icons/si'
+import { useState, useEffect } from 'react'
+import { Check, ArrowRight, Star, ChevronRight } from 'lucide-react'
+import { SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiSpotify, SiGithub, SiTelegram, SiWhatsapp, SiX, SiThreads } from 'react-icons/si'
 
-// ─── Animated phone mockup ────────────────────────────────────────────────────
-function PhoneMockup() {
+// ─── Global CSS ────────────────────────────────────────────────────────────────
+const CSS = `
+  *{box-sizing:border-box;margin:0;padding:0}
+  @keyframes float{0%,100%{transform:translateY(0px) rotate(-1deg)}50%{transform:translateY(-14px) rotate(1deg)}}
+  @keyframes float2{0%,100%{transform:translateY(0px)}50%{transform:translateY(-8px)}}
+  @keyframes float3{0%,100%{transform:translateY(0px)}50%{transform:translateY(-6px)}}
+  @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  @keyframes pulse-ring{0%{transform:scale(.8);opacity:.8}100%{transform:scale(2);opacity:0}}
+  @keyframes glow-pulse{0%,100%{opacity:.6}50%{opacity:1}}
+  @keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes counter{from{opacity:0}to{opacity:1}}
+  @keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+  .land *{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  .land a{text-decoration:none}
+  .land h1,.land h2,.land h3{letter-spacing:-0.04em;line-height:1.05}
+
+  .btn-cta{
+    display:inline-flex;align-items:center;gap:10px;
+    background:#fff;color:#0a0a0a;
+    font-weight:800;font-size:16px;
+    padding:15px 32px;border-radius:14px;border:none;cursor:pointer;
+    box-shadow:0 0 0 1px rgba(255,255,255,.15),0 4px 32px rgba(255,255,255,.2);
+    transition:all .2s;
+  }
+  .btn-cta:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(255,255,255,.3),0 8px 48px rgba(255,255,255,.3)}
+
+  .btn-ghost{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);
+    font-weight:600;font-size:15px;
+    padding:14px 28px;border-radius:14px;
+    border:1px solid rgba(255,255,255,.12);
+    cursor:pointer;transition:all .2s;
+  }
+  .btn-ghost:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)}
+
+  .badge-float{
+    position:absolute;
+    background:rgba(15,15,15,.85);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:16px;padding:10px 14px;
+    backdrop-filter:blur(16px);
+    display:flex;align-items:center;gap:10px;
+    white-space:nowrap;color:#fff;
+    box-shadow:0 8px 32px rgba(0,0,0,.4);
+  }
+  .badge-float span{font-size:12px;font-weight:700}
+
+  .feat-item:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.12)!important;background:rgba(255,255,255,.06)!important}
+  .feat-item{transition:all .25s}
+
+  .card-light{background:#fff;border-radius:24px;border:1px solid #f0ede8}
+  .card-light:hover{box-shadow:0 8px 40px rgba(0,0,0,.08);transform:translateY(-2px)}
+  .card-light{transition:all .25s}
+
+  .pro-badge{
+    background:linear-gradient(135deg,#f59e0b,#f97316);
+    color:#000;font-size:10px;font-weight:900;letter-spacing:1.5px;
+    text-transform:uppercase;padding:3px 10px;border-radius:99px;
+  }
+`
+
+// ─── Phone mockup ──────────────────────────────────────────────────────────────
+function Phone() {
   return (
     <div style={{
-      width: 240, height: 480,
-      background: 'linear-gradient(160deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)',
-      borderRadius: 36,
-      border: '3px solid rgba(255,255,255,0.12)',
-      boxShadow: '0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.1)',
-      overflow: 'hidden',
-      position: 'relative',
-      flexShrink: 0,
+      width: 260, height: 520,
+      borderRadius: 44,
+      background: '#0d0d14',
+      border: '2px solid rgba(255,255,255,.18)',
+      boxShadow: '0 0 0 1px rgba(255,255,255,.05),0 60px 120px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.12)',
+      overflow: 'hidden', position: 'relative', flexShrink: 0,
     }}>
-      {/* Notch */}
-      <div style={{ position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)', width: 60, height: 6, background: 'rgba(0,0,0,0.6)', borderRadius: 99, zIndex: 10 }} />
-      {/* Screen glow */}
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 30%,rgba(99,102,241,.15) 0%,transparent 70%)' }} />
-      {/* Content */}
-      <div style={{ padding: '36px 16px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, height: '100%' }}>
-        {/* Avatar */}
-        <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'linear-gradient(135deg,#f59e0b,#ef4444)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(245,158,11,.4)', fontSize: 24, marginBottom: 4 }}>
-          ✨
+      {/* Status bar pill */}
+      <div style={{ position:'absolute',top:16,left:'50%',transform:'translateX(-50%)',width:80,height:8,background:'#111',borderRadius:99,zIndex:10 }} />
+      {/* Background gradient */}
+      <div style={{ position:'absolute',inset:0,background:'radial-gradient(ellipse at 50% 0%,rgba(99,102,241,.2) 0%,transparent 60%)' }} />
+
+      <div style={{ padding:'40px 18px 20px',display:'flex',flexDirection:'column',alignItems:'center',gap:10,height:'100%' }}>
+        {/* Avatar with glow */}
+        <div style={{ position:'relative',marginBottom:4 }}>
+          <div style={{ position:'absolute',inset:-6,borderRadius:'50%',background:'linear-gradient(135deg,#6366f1,#ec4899)',opacity:.4,filter:'blur(8px)' }} />
+          <div style={{ width:68,height:68,borderRadius:'50%',background:'linear-gradient(135deg,#6366f1,#ec4899)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,position:'relative',border:'3px solid rgba(255,255,255,.15)' }}>
+            ✨
+          </div>
         </div>
-        {/* Name */}
-        <div style={{ height: 10, width: 100, background: 'rgba(255,255,255,0.85)', borderRadius: 99 }} />
-        <div style={{ height: 7, width: 70, background: 'rgba(255,255,255,0.35)', borderRadius: 99 }} />
-        {/* Social icons row */}
-        <div style={{ display: 'flex', gap: 8, marginTop: 4, marginBottom: 4 }}>
-          {['#E1306C','#010101','#FF0000','#0068FF'].map((c,i) => (
-            <div key={i} style={{ width: 20, height: 20, borderRadius: '50%', background: c, opacity: 0.85 }} />
+        <div style={{ height:11,width:110,background:'rgba(255,255,255,.9)',borderRadius:99 }} />
+        <div style={{ height:8,width:74,background:'rgba(255,255,255,.3)',borderRadius:99 }} />
+        {/* Socials */}
+        <div style={{ display:'flex',gap:8,margin:'2px 0' }}>
+          {['#E1306C','#010101','#FF0000','#1DA1F2','#29ABE2'].map((c,i) => (
+            <div key={i} style={{ width:22,height:22,borderRadius:6,background:c,opacity:.85 }} />
           ))}
         </div>
         {/* Links */}
         {[
-          { bg: 'rgba(255,255,255,0.1)', w: 176, label: 'Instagram', color: '#E1306C' },
-          { bg: 'rgba(255,255,255,0.08)', w: 176, label: 'TikTok', color: '#010101' },
-          { bg: 'rgba(255,255,255,0.08)', w: 176, label: 'YouTube', color: '#FF0000' },
-          { bg: 'rgba(245,158,11,.18)', w: 176, label: '🎵 Spotify', color: '#1ED760' },
+          {label:'Instagram', color:'#E1306C', delay:.1},
+          {label:'TikTok',    color:'#010101', delay:.2},
+          {label:'YouTube',   color:'#FF0000', delay:.3},
+          {label:'Portfolio', color:'#6366f1', delay:.4},
         ].map((l,i) => (
           <div key={i} style={{
-            width: l.w, height: 34, borderRadius: 10,
-            background: l.bg,
-            border: '1px solid rgba(255,255,255,0.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backdropFilter: 'blur(8px)',
-            gap: 6,
-            animation: `fadeInUp .4s ease ${i * .1 + .2}s both`,
+            width:210,height:38,borderRadius:12,
+            background:`linear-gradient(135deg,${l.color}22,rgba(255,255,255,.04))`,
+            border:`1px solid ${l.color}44`,
+            display:'flex',alignItems:'center',justifyContent:'center',gap:8,
+            animation:`fade-up .4s ease ${l.delay}s both`,
           }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: l.color }} />
-            <div style={{ height: 7, width: 60, background: 'rgba(255,255,255,0.5)', borderRadius: 99 }} />
+            <div style={{ width:7,height:7,borderRadius:'50%',background:l.color,boxShadow:`0 0 6px ${l.color}` }} />
+            <div style={{ height:7,width:70,background:'rgba(255,255,255,.55)',borderRadius:99 }} />
           </div>
         ))}
-        {/* Spotify player bar */}
-        <div style={{
-          width: 176, background: 'rgba(30,215,96,.12)', borderRadius: 10, padding: '6px 10px',
-          border: '1px solid rgba(30,215,96,.3)', marginTop: 2,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 18, height: 18, borderRadius: 4, background: '#1ED760', flexShrink: 0 }} />
-            <div style={{ flex: 1 }}>
-              <div style={{ height: 5, width: 60, background: 'rgba(255,255,255,0.6)', borderRadius: 99, marginBottom: 3 }} />
-              <div style={{ height: 3, width: 100, background: 'rgba(30,215,96,.4)', borderRadius: 99 }} />
+        {/* Spotify mini */}
+        <div style={{ width:210,background:'rgba(30,215,96,.08)',border:'1px solid rgba(30,215,96,.3)',borderRadius:12,padding:'8px 12px' }}>
+          <div style={{ display:'flex',alignItems:'center',gap:8 }}>
+            <div style={{ width:22,height:22,borderRadius:6,background:'#1ED760',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11 }}>▶</div>
+            <div>
+              <div style={{ height:6,width:72,background:'rgba(255,255,255,.65)',borderRadius:99,marginBottom:4 }} />
+              <div style={{ height:4,width:110,background:'rgba(30,215,96,.4)',borderRadius:99 }} />
             </div>
           </div>
         </div>
-        {/* Bottom badge */}
-        <div style={{ marginTop: 'auto', background: 'rgba(255,255,255,0.06)', borderRadius: 8, padding: '4px 10px', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase' }}>DONLY</span>
+        {/* Views counter */}
+        <div style={{ marginTop:'auto',display:'flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.05)',borderRadius:10,padding:'6px 12px',border:'1px solid rgba(255,255,255,.07)' }}>
+          <div style={{ width:6,height:6,borderRadius:'50%',background:'#10b981',boxShadow:'0 0 6px #10b981' }} />
+          <span style={{ fontSize:10,color:'rgba(255,255,255,.4)',fontWeight:700,letterSpacing:2,textTransform:'uppercase' }}>donlybio.vercel.app</span>
         </div>
       </div>
-      <style>{`@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
     </div>
   )
 }
 
-// ─── Floating badge ───────────────────────────────────────────────────────────
-function FloatBadge({ style, children }: { style: React.CSSProperties; children: React.ReactNode }) {
-  return (
-    <div style={{
-      position: 'absolute', background: 'rgba(255,255,255,0.95)',
-      borderRadius: 14, padding: '8px 14px', boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-      border: '1px solid rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)',
-      display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700,
-      color: '#111', whiteSpace: 'nowrap', animation: 'floatY 3s ease-in-out infinite',
-      ...style,
-    }}>
-      {children}
-    </div>
-  )
-}
+// ─── Platforms marquee ─────────────────────────────────────────────────────────
+const PLAT_ICONS = [SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiSpotify, SiGithub, SiTelegram, SiWhatsapp, SiX, SiThreads]
+const PLAT_COLORS = ['#E1306C','#010101','#FF0000','#1877F2','#1ED760','#333','#229ED9','#25D366','#000','#101010']
 
-// ─── Platform logos marquee ───────────────────────────────────────────────────
-const PLATFORMS = [SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiSpotify, SiGithub, SiTelegram, SiWhatsapp, SiX, SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiSpotify]
-
-const FEATURE_CARDS = [
-  { icon: Palette,       label: 'Templates đẹp',      desc: '30+ themes, 19 layouts',      grad: 'linear-gradient(135deg,#667eea,#764ba2)', glyph: '🎨' },
-  { icon: BarChart2,     label: 'Analytics chi tiết',  desc: 'Biểu đồ views, clicks, CTR',  grad: 'linear-gradient(135deg,#f093fb,#f5576c)', glyph: '📊' },
-  { icon: Music,         label: 'Music Player',        desc: 'Spotify & YouTube embed',     grad: 'linear-gradient(135deg,#4facfe,#00f2fe)', glyph: '🎵' },
-  { icon: MessageSquare, label: 'Contact Form',        desc: 'Inbox tin nhắn trực tiếp',    grad: 'linear-gradient(135deg,#43e97b,#38f9d7)', glyph: '💬' },
-  { icon: Star,          label: 'Testimonials',        desc: 'Đánh giá từ khách hàng',      grad: 'linear-gradient(135deg,#fa709a,#fee140)', glyph: '⭐' },
-  { icon: QrCode,        label: 'QR Code',             desc: 'Chia sẻ offline dễ dàng',     grad: 'linear-gradient(135deg,#a18cd1,#fbc2eb)', glyph: '📱' },
-  { icon: Lock,          label: 'Bảo vệ trang',        desc: 'Đặt mật khẩu riêng (Pro)',    grad: 'linear-gradient(135deg,#ffecd2,#fcb69f)', glyph: '🔒' },
-  { icon: Zap,           label: 'Links nâng cao',      desc: 'Schedule, animation, VCard',  grad: 'linear-gradient(135deg,#a1c4fd,#c2e9fb)', glyph: '⚡' },
-  { icon: Sparkles,      label: 'Custom CSS',          desc: 'Tùy biến không giới hạn',     grad: 'linear-gradient(135deg,#fd7043,#ffb74d)', glyph: '✨' },
-  { icon: Globe,         label: 'GitHub Stats',        desc: 'Card thống kê GitHub live',   grad: 'linear-gradient(135deg,#30cfd0,#667eea)', glyph: '🐙' },
-  { icon: Link2,         label: 'VCard Download',      desc: 'Khách lưu contact ngay',      grad: 'linear-gradient(135deg,#f5af19,#f12711)', glyph: '👤' },
-  { icon: BarChart2,     label: 'Clicks Chart',        desc: 'Biểu đồ click theo ngày',     grad: 'linear-gradient(135deg,#c471ed,#12c2e9)', glyph: '📈' },
+// ─── Feature list ──────────────────────────────────────────────────────────────
+const FEATURES = [
+  { emoji:'🎨', title:'30+ Templates đẹp',     desc:'Mỗi template có palette màu riêng, preview thật trước khi chọn.' },
+  { emoji:'📐', title:'19 Layout options',       desc:'Grid, Gallery, Magazine, Minimal, Bold... tự chọn bố cục phù hợp nhất.' },
+  { emoji:'📊', title:'Analytics chi tiết',      desc:'Views, clicks, CTR — biểu đồ theo ngày, 7/30/90 ngày.' },
+  { emoji:'🎵', title:'Music Player',            desc:'Nhúng Spotify hoặc YouTube ngay trên trang bio, không cần rời trang.' },
+  { emoji:'💬', title:'Contact Form + Inbox',    desc:'Khách nhắn tin thẳng, bạn đọc trong Dashboard mà không cần email.' },
+  { emoji:'⭐', title:'Testimonials',            desc:'Thêm đánh giá từ khách hàng với rating, hiển thị đẹp trên bio page.' },
+  { emoji:'📱', title:'QR Code',                desc:'Tự tạo QR dẫn về bio page, tải PNG để dùng offline.' },
+  { emoji:'🔒', title:'Bảo vệ trang',           desc:'Đặt mật khẩu riêng cho trang bio, phù hợp nội dung giới hạn. Pro.', pro:true },
+  { emoji:'✨', title:'Custom CSS',              desc:'Nhập CSS tuỳ ý để tùy biến không giới hạn — full control. Pro.', pro:true },
+  { emoji:'🐙', title:'GitHub Stats Block',      desc:'Card live thống kê GitHub: repos, followers, bio tự động cập nhật.' },
+  { emoji:'👤', title:'VCard Download',          desc:'Visitor bấm một nút để lưu contact của bạn thẳng vào điện thoại.' },
+  { emoji:'⚡', title:'Link nâng cao',           desc:'Schedule lịch bật/tắt link, hiệu ứng animation, highlight màu.' },
 ]
 
-const STEPS = [
-  { n: '01', title: 'Đăng ký miễn phí',    desc: 'Tạo tài khoản trong vài giây, không cần thẻ ngân hàng.',       emoji: '🚀' },
-  { n: '02', title: 'Tùy chỉnh trang bio', desc: 'Chọn template, thêm links, âm nhạc, contact form và nhiều hơn nữa.', emoji: '🎨' },
-  { n: '03', title: 'Chia sẻ link của bạn',desc: 'Một URL duy nhất — dùng cho Instagram, TikTok, danh thiếp…',   emoji: '✨' },
-]
-
+// ─── Testimonials ──────────────────────────────────────────────────────────────
 const TESTIMONIALS = [
-  { name: 'Minh Khoa',  role: 'Content Creator',   text: 'DONLY giúp mình gom hết link vào một chỗ. Profile nhìn cực chuyên nghiệp, khách hàng ấn tượng lắm!', color: '#f59e0b', avatar: 'MK' },
-  { name: 'Thu Hương',  role: 'Freelance Designer', text: 'Music player và contact form là 2 tính năng mình yêu nhất. Khách hàng nhắn tin thẳng mà không cần email.', color: '#ec4899', avatar: 'TH' },
-  { name: 'Anh Tú',    role: 'Photographer',       text: 'Layouts Gallery & Magazine hiển thị ảnh portfolio cực đẹp. Analytics giúp mình hiểu audience rõ hơn.', color: '#3b82f6', avatar: 'AT' },
-  { name: 'Linh Chi',  role: 'Musician',           text: 'Tích hợp Spotify ngay trên bio page quá đỉnh. Fans nghe nhạc mà không cần rời trang!', color: '#10b981', avatar: 'LC' },
-  { name: 'Duy Phong', role: 'YouTuber',           text: 'Từ khi dùng DONLY, lượng sub YouTube tăng rõ rệt vì mình hướng traffic từ bio page hiệu quả hơn.', color: '#8b5cf6', avatar: 'DP' },
-  { name: 'Hà My',     role: 'Influencer',         text: 'Templates PRO đẹp cực kỳ! Page của mình trông xịn như brand lớn mà không tốn nhiều tiền.', color: '#ef4444', avatar: 'HM' },
+  { name:'Minh Khoa',  role:'Content Creator',    avatar:'MK', color:'#6366f1', text:'Profile mình trông xịn hẳn sau khi dùng DONLY. Khách hàng hỏi design bằng tool gì 😂' },
+  { name:'Thu Hương',  role:'Freelance Designer',  avatar:'TH', color:'#ec4899', text:'Music player là tính năng yêu thích nhất. Fan nghe nhạc ngay trên bio mà không cần mở app khác!' },
+  { name:'Anh Tú',    role:'Photographer',        avatar:'AT', color:'#3b82f6', text:'Layout Gallery hiển thị portfolio cực kỳ đẹp. Lần đầu thấy một bio link có thể làm điều này.' },
+  { name:'Linh Chi',  role:'Musician',            avatar:'LC', color:'#10b981', text:'Từ khi bật Spotify embed, thời gian khách ở trên trang bio của mình tăng gấp đôi!' },
+  { name:'Duy Phong', role:'YouTuber',            avatar:'DP', color:'#f59e0b', text:'Analytics giúp mình biết hôm nào traffic cao, content nào đang dẫn nhiều click nhất.' },
+  { name:'Hà My',     role:'KOL / Influencer',    avatar:'HM', color:'#ef4444', text:'Templates PRO đẹp vô cùng. Brand mình trông professional hẳn mà không cần thuê designer.' },
 ]
 
-const FREE_FEATURES  = ['30+ templates & themes', '13 layouts miễn phí', 'Không giới hạn links', 'Music player, QR code', 'Contact form + Inbox', 'Testimonials block', 'Analytics 7-30 ngày', 'VCard download', 'GitHub Stats block']
-const PRO_FEATURES   = ['Tất cả tính năng Free', '4 templates PRO độc quyền', '7 layouts PRO độc quyền', 'Analytics 90 ngày + CTR', 'Bảo vệ trang bằng mật khẩu', 'Custom CSS không giới hạn', 'Social bar không giới hạn', 'Gradient & ảnh nền tuỳ chỉnh', 'Announcement banner PRO']
+const FREE_F = ['30+ templates & themes','13 layout miễn phí','Không giới hạn links','Music player + QR code','Contact form + Inbox','Testimonials block','Analytics 7 & 30 ngày','VCard download','GitHub Stats block','Social icon bar']
+const PRO_F  = ['Tất cả tính năng Free','4 templates PRO độc quyền','7 layouts PRO độc quyền','Analytics 90 ngày + CTR','Bảo vệ trang bằng mật khẩu','Custom CSS không giới hạn','Social bar không giới hạn','Background image / gradient','Announcement banner']
 
+// ─── Counter hook ──────────────────────────────────────────────────────────────
+function useCountUp(target: number, duration = 1500) {
+  const [val, setVal] = useState(0)
+  useEffect(() => {
+    const start = performance.now()
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1)
+      setVal(Math.round(p * target))
+      if (p < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }, [target, duration])
+  return val
+}
+
+function StatCard({ n, suffix='', label }: { n: number; suffix?: string; label: string }) {
+  const val = useCountUp(n)
+  return (
+    <div style={{ textAlign:'center' }}>
+      <div style={{ fontSize:48,fontWeight:900,color:'#fff',letterSpacing:-2,lineHeight:1 }}>
+        {val.toLocaleString()}{suffix}
+      </div>
+      <div style={{ fontSize:14,color:'rgba(255,255,255,.45)',fontWeight:600,marginTop:6 }}>{label}</div>
+    </div>
+  )
+}
+
+// ─── Main component ────────────────────────────────────────────────────────────
 export default function Landing() {
   return (
-    <div style={{ fontFamily: 'system-ui,-apple-system,sans-serif', color: '#111', background: '#fff', overflowX: 'hidden' }}>
-      <style>{`
-        @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-        @keyframes floatY2{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-        @keyframes gradMove{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-        @keyframes marquee{ 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-        @keyframes shimmer{ 0%{background-position:-400px 0} 100%{background-position:400px 0} }
-        .land-btn-primary{ background:#333A2F; color:#fff; font-weight:700; border-radius:14px; padding:13px 28px; font-size:15px; border:none; cursor:pointer; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; gap:8px }
-        .land-btn-primary:hover{ opacity:.88; transform:translateY(-1px); box-shadow:0 8px 24px rgba(51,58,47,.35) }
-        .land-btn-ghost{ background:transparent; color:#333A2F; font-weight:600; border-radius:14px; padding:12px 24px; font-size:14px; border:2px solid #e5e7eb; cursor:pointer; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; gap:8px }
-        .land-btn-ghost:hover{ border-color:#333A2F; background:#EBEDDF }
-        .feat-card:hover{ transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.1) }
-        .feat-card{ transition:all .25s }
-        .step-card:hover .step-num{ transform:scale(1.1) }
-        .step-num{ transition:transform .2s }
-      `}</style>
+    <div className="land" style={{ background:'#070709',color:'#fff',overflowX:'hidden',minHeight:'100vh' }}>
+      <style>{CSS}</style>
 
-      {/* ── Nav ───────────────────────────────────────────────────────────────── */}
+      {/* ── Nav ─────────────────────────────────────────────────────────────── */}
       <nav style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(0,0,0,0.06)',
-        padding: '0 32px', height: 64,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        position:'sticky',top:0,zIndex:999,
+        borderBottom:'1px solid rgba(255,255,255,.06)',
+        background:'rgba(7,7,9,.8)',backdropFilter:'blur(24px)',
+        padding:'0 40px',height:64,
+        display:'flex',alignItems:'center',justifyContent:'space-between',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 12, background: '#333A2F', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(51,58,47,.3)' }}>
-            <span style={{ color: '#EBEDDF', fontWeight: 900, fontSize: 16 }}>D</span>
+        <div style={{ display:'flex',alignItems:'center',gap:10 }}>
+          <div style={{
+            width:34,height:34,borderRadius:10,
+            background:'linear-gradient(135deg,#333A2F,#5a7a4a)',
+            display:'flex',alignItems:'center',justifyContent:'center',
+            boxShadow:'0 0 20px rgba(90,122,74,.4)',
+          }}>
+            <span style={{ color:'#EBEDDF',fontWeight:900,fontSize:17 }}>D</span>
           </div>
-          <span style={{ fontWeight: 900, fontSize: 20, letterSpacing: '-0.5px', color: '#333A2F' }}>DONLY</span>
+          <span style={{ fontWeight:900,fontSize:20,letterSpacing:-0.5,color:'#fff' }}>DONLY</span>
+          <span style={{ fontSize:11,fontWeight:700,color:'rgba(255,255,255,.3)',letterSpacing:2,textTransform:'uppercase',marginLeft:4 }}>Bio</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Link to="/login" style={{ color: '#555', fontWeight: 500, fontSize: 14, textDecoration: 'none' }}>Đăng nhập</Link>
-          <Link to="/login" className="land-btn-primary" style={{ padding: '9px 20px', fontSize: 14, borderRadius: 12 }}>
-            Bắt đầu miễn phí <ArrowRight size={15} />
+        <div style={{ display:'flex',alignItems:'center',gap:12 }}>
+          <Link to="/login" style={{ color:'rgba(255,255,255,.55)',fontWeight:500,fontSize:14 }}>Đăng nhập</Link>
+          <Link to="/login" style={{
+            background:'#fff',color:'#0a0a0a',fontWeight:800,fontSize:14,
+            padding:'9px 20px',borderRadius:12,
+            display:'inline-flex',alignItems:'center',gap:6,
+            transition:'all .2s',
+          }}
+            onMouseEnter={e => { const t=e.currentTarget; t.style.background='#f0f0f0'; t.style.transform='translateY(-1px)' }}
+            onMouseLeave={e => { const t=e.currentTarget; t.style.background='#fff'; t.style.transform='' }}>
+            Bắt đầu <ArrowRight size={14} />
           </Link>
         </div>
       </nav>
 
-      {/* ── Hero ──────────────────────────────────────────────────────────────── */}
-      <section style={{
-        minHeight: '92vh',
-        background: 'radial-gradient(ellipse at 20% 50%,rgba(51,58,47,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(245,158,11,.07) 0%,transparent 60%),radial-gradient(ellipse at 60% 80%,rgba(99,102,241,.05) 0%,transparent 60%),#fafaf8',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '80px 32px 60px',
-        gap: 64, flexWrap: 'wrap',
-      }}>
-        {/* Text */}
-        <div style={{ maxWidth: 540, flex: '1 1 320px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#EBEDDF', borderRadius: 99, padding: '6px 16px', marginBottom: 28, border: '1px solid rgba(51,58,47,.15)' }}>
-            <Sparkles size={13} style={{ color: '#333A2F' }} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#333A2F', letterSpacing: .3 }}>Trang bio thế hệ mới cho người Việt</span>
-          </div>
-          <h1 style={{ fontSize: 64, fontWeight: 900, lineHeight: 1.05, letterSpacing: -2, marginBottom: 24, color: '#0a0a0a' }}>
-            Một link.
-            <br />
-            <span style={{
-              background: 'linear-gradient(135deg,#333A2F 0%,#5a7a4a 40%,#f59e0b 70%,#ef4444 100%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}>
-              Mọi thứ của bạn.
-            </span>
-          </h1>
-          <p style={{ fontSize: 18, color: '#666', lineHeight: 1.7, marginBottom: 36, maxWidth: 460 }}>
-            Tạo trang bio cá nhân đẹp mắt, chuyên nghiệp trong vài phút. Chia sẻ links, âm nhạc, portfolio, contact form — tất cả qua <strong style={{ color: '#333A2F' }}>một URL duy nhất</strong>.
-          </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Link to="/login" className="land-btn-primary">
-              Tạo trang miễn phí <ArrowRight size={16} />
-            </Link>
-            <Link to="/u/demo" className="land-btn-ghost" target="_blank">
-              Xem demo →
-            </Link>
-          </div>
-          {/* Trust badges */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 32 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ display: 'flex' }}>
-                {['#f59e0b','#ec4899','#3b82f6','#10b981'].map((c,i) => (
-                  <div key={i} style={{ width: 26, height: 26, borderRadius: '50%', background: c, border: '2px solid #fff', marginLeft: i > 0 ? -8 : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff' }}>
-                    {['M','T','A','L'][i]}
+      {/* ── Hero ────────────────────────────────────────────────────────────── */}
+      <section style={{ position:'relative',minHeight:'90vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'80px 40px 60px',overflow:'hidden' }}>
+        {/* Background orbs */}
+        <div style={{ position:'absolute',top:'-10%',left:'10%',width:600,height:600,borderRadius:'50%',background:'radial-gradient(circle,rgba(99,102,241,.12) 0%,transparent 70%)',pointerEvents:'none' }} />
+        <div style={{ position:'absolute',bottom:'0%',right:'5%',width:500,height:500,borderRadius:'50%',background:'radial-gradient(circle,rgba(236,72,153,.08) 0%,transparent 70%)',pointerEvents:'none' }} />
+        <div style={{ position:'absolute',top:'40%',left:'50%',width:400,height:400,borderRadius:'50%',background:'radial-gradient(circle,rgba(245,158,11,.06) 0%,transparent 70%)',pointerEvents:'none',transform:'translateX(-50%)' }} />
+
+        <div style={{ maxWidth:1160,width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',gap:60,flexWrap:'wrap' }}>
+          {/* Left: text */}
+          <div style={{ flex:'1 1 420px',maxWidth:560 }}>
+            {/* Pill badge */}
+            <div style={{ display:'inline-flex',alignItems:'center',gap:8,marginBottom:32,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:99,padding:'6px 16px' }}>
+              <div style={{ width:6,height:6,borderRadius:'50%',background:'#10b981',boxShadow:'0 0 8px #10b981',animation:'glow-pulse 2s ease-in-out infinite' }} />
+              <span style={{ fontSize:13,fontWeight:600,color:'rgba(255,255,255,.7)' }}>Miễn phí mãi mãi · Không cần thẻ ngân hàng</span>
+            </div>
+
+            <h1 style={{ fontSize:'clamp(48px,6vw,80px)',fontWeight:900,color:'#fff',marginBottom:24 }}>
+              Một link.
+              <br />
+              <span style={{
+                background:'linear-gradient(135deg,#a5b4fc 0%,#818cf8 30%,#f472b6 60%,#fb923c 100%)',
+                WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text',
+              }}>
+                Mọi thứ của bạn.
+              </span>
+            </h1>
+
+            <p style={{ fontSize:18,color:'rgba(255,255,255,.5)',lineHeight:1.75,marginBottom:40,maxWidth:460 }}>
+              Tạo trang bio cá nhân đẹp, chuyên nghiệp trong <strong style={{ color:'rgba(255,255,255,.8)' }}>2 phút</strong>. Links, nhạc, form liên hệ, testimonials — tất cả qua <strong style={{ color:'rgba(255,255,255,.8)' }}>một URL duy nhất</strong>.
+            </p>
+
+            <div style={{ display:'flex',gap:12,flexWrap:'wrap',marginBottom:48 }}>
+              <Link to="/login" className="btn-cta">
+                Tạo trang miễn phí <ArrowRight size={17} />
+              </Link>
+              <Link to="/u/demo" className="btn-ghost" target="_blank">
+                Xem demo →
+              </Link>
+            </div>
+
+            {/* Social proof */}
+            <div style={{ display:'flex',alignItems:'center',gap:16,flexWrap:'wrap' }}>
+              <div style={{ display:'flex',alignItems:'center' }}>
+                {['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6'].map((c,i) => (
+                  <div key={i} style={{ width:30,height:30,borderRadius:'50%',background:c,border:'2px solid #070709',marginLeft:i>0?-10:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,color:'#fff' }}>
+                    {['M','T','A','L','D'][i]}
                   </div>
                 ))}
               </div>
-              <span style={{ fontSize: 12, color: '#777', fontWeight: 600 }}>+1,000 creators</span>
-            </div>
-            <div style={{ display: 'flex', gap: 2 }}>
-              {[1,2,3,4,5].map(n => <Star key={n} size={14} fill="#f59e0b" style={{ color: '#f59e0b' }} />)}
-            </div>
-            <span style={{ fontSize: 12, color: '#777', fontWeight: 600 }}>5.0 / 5 ⭐</span>
-          </div>
-        </div>
-
-        {/* Phone mockup */}
-        <div style={{ position: 'relative', flexShrink: 0, animation: 'floatY 4s ease-in-out infinite' }}>
-          <PhoneMockup />
-          {/* Glow behind phone */}
-          <div style={{ position: 'absolute', inset: '-20%', background: 'radial-gradient(circle,rgba(99,102,241,.15) 0%,transparent 70%)', zIndex: -1, borderRadius: '50%' }} />
-          {/* Floating badges */}
-          <FloatBadge style={{ top: 40, left: -130, animationDuration: '3.5s' }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
-            <span>Link click +42%</span>
-          </FloatBadge>
-          <FloatBadge style={{ bottom: 100, left: -120, animationDuration: '4s', animationDelay: '.5s' }}>
-            <span style={{ fontSize: 16 }}>🎵</span>
-            <span>Spotify embedded</span>
-          </FloatBadge>
-          <FloatBadge style={{ top: 120, right: -140, animationDuration: '3s', animationDelay: '1s' }}>
-            <span style={{ fontSize: 16 }}>👋</span>
-            <span>New message!</span>
-          </FloatBadge>
-          <FloatBadge style={{ bottom: 200, right: -130, animationDuration: '5s', animationDelay: '.3s' }}>
-            <span style={{ fontSize: 16 }}>📊</span>
-            <span>128 views today</span>
-          </FloatBadge>
-        </div>
-      </section>
-
-      {/* ── Platform logos strip ───────────────────────────────────────────────── */}
-      <section style={{ padding: '40px 0', borderTop: '1px solid #f0f0f0', borderBottom: '1px solid #f0f0f0', overflow: 'hidden', background: '#fafaf8' }}>
-        <p style={{ textAlign: 'center', fontSize: 11, fontWeight: 700, letterSpacing: 3, color: '#aaa', textTransform: 'uppercase', marginBottom: 20 }}>Kết nối với mọi nền tảng</p>
-        <div style={{ display: 'flex', animation: 'marquee 18s linear infinite', width: 'max-content' }}>
-          {PLATFORMS.map((Icon, i) => (
-            <div key={i} style={{ width: 56, height: 56, borderRadius: 16, background: '#fff', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 8px', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,.04)' }}>
-              <Icon size={22} style={{ color: '#555' }} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Stats ─────────────────────────────────────────────────────────────── */}
-      <section style={{ padding: '72px 32px', background: '#fff' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 16 }}>
-          {[
-            { n: '1,000+',  label: 'Creators đang dùng', emoji: '🚀' },
-            { n: '30+',     label: 'Templates đẹp',       emoji: '🎨' },
-            { n: '19',      label: 'Layout options',       emoji: '📐' },
-            { n: '< 2 phút',label: 'Để tạo trang bio',    emoji: '⚡' },
-          ].map(s => (
-            <div key={s.n} style={{ textAlign: 'center', padding: '32px 16px', borderRadius: 24, background: '#EBEDDF', border: '1px solid rgba(51,58,47,.1)' }}>
-              <div style={{ fontSize: 28 }}>{s.emoji}</div>
-              <div style={{ fontSize: 36, fontWeight: 900, color: '#333A2F', letterSpacing: -1, marginTop: 8 }}>{s.n}</div>
-              <div style={{ fontSize: 13, color: '#666', fontWeight: 600, marginTop: 4 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Features grid ────────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 32px', background: '#fafaf8' }}>
-        <div style={{ maxWidth: 960, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: '#aaa', textTransform: 'uppercase' }}>Tính năng</span>
-            <h2 style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1.5, color: '#0a0a0a', marginTop: 10, marginBottom: 12 }}>Mọi thứ bạn cần</h2>
-            <p style={{ fontSize: 16, color: '#777', maxWidth: 460, margin: '0 auto' }}>12+ tính năng được thiết kế để trang bio của bạn trở nên nổi bật và hiệu quả.</p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 14 }}>
-            {FEATURE_CARDS.map(f => (
-              <div key={f.label} className="feat-card" style={{
-                borderRadius: 20, overflow: 'hidden',
-                border: '1px solid rgba(0,0,0,0.06)',
-                background: '#fff',
-                cursor: 'default',
-              }}>
-                <div style={{ height: 6, background: f.grad }} />
-                <div style={{ padding: '18px 18px 16px' }}>
-                  <div style={{ fontSize: 28, marginBottom: 10 }}>{f.glyph}</div>
-                  <p style={{ fontWeight: 800, fontSize: 14, color: '#111', marginBottom: 4 }}>{f.label}</p>
-                  <p style={{ fontSize: 12, color: '#888', lineHeight: 1.5 }}>{f.desc}</p>
+              <div>
+                <div style={{ display:'flex',gap:2,marginBottom:3 }}>
+                  {[1,2,3,4,5].map(n => <Star key={n} size={13} fill="#f59e0b" style={{ color:'#f59e0b' }} />)}
                 </div>
+                <span style={{ fontSize:12,color:'rgba(255,255,255,.4)',fontWeight:600 }}>Tin dùng bởi 1,000+ creators Việt Nam</span>
               </div>
-            ))}
+            </div>
+          </div>
+
+          {/* Right: phone + floating badges */}
+          <div style={{ flex:'0 0 auto',position:'relative',width:380,height:580,display:'flex',alignItems:'center',justifyContent:'center' }}>
+            {/* Glow behind phone */}
+            <div style={{ position:'absolute',inset:'-15%',background:'radial-gradient(circle,rgba(99,102,241,.2) 0%,transparent 65%)',borderRadius:'50%',animation:'glow-pulse 3s ease-in-out infinite' }} />
+
+            {/* The phone */}
+            <div style={{ animation:'float 5s ease-in-out infinite', zIndex:2 }}>
+              <Phone />
+            </div>
+
+            {/* Floating badges — positioned in the 380×580 wrapper */}
+            <div className="badge-float" style={{ top:50,left:0,animation:'float2 3.5s ease-in-out infinite' }}>
+              <div style={{ width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,#10b981,#059669)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14 }}>📊</div>
+              <div>
+                <div style={{ fontSize:10,color:'rgba(255,255,255,.45)',fontWeight:600 }}>Hôm nay</div>
+                <span style={{ fontSize:14,fontWeight:800 }}>+128 views</span>
+              </div>
+            </div>
+
+            <div className="badge-float" style={{ top:140,right:0,animation:'float3 4s ease-in-out infinite .5s' }}>
+              <div style={{ fontSize:18 }}>👋</div>
+              <div>
+                <div style={{ fontSize:10,color:'rgba(255,255,255,.45)',fontWeight:600 }}>Tin nhắn mới</div>
+                <span style={{ fontSize:13,fontWeight:700 }}>Hà My: "Cho mình hỏi..."</span>
+              </div>
+            </div>
+
+            <div className="badge-float" style={{ bottom:180,left:0,animation:'float2 4.5s ease-in-out infinite 1s' }}>
+              <div style={{ width:28,height:28,borderRadius:8,background:'#1ED760',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#000' }}>▶</div>
+              <div>
+                <div style={{ fontSize:10,color:'rgba(255,255,255,.45)',fontWeight:600 }}>Đang phát</div>
+                <span style={{ fontSize:13,fontWeight:700 }}>Spotify embedded</span>
+              </div>
+            </div>
+
+            <div className="badge-float" style={{ bottom:80,right:0,animation:'float3 3.8s ease-in-out infinite .3s' }}>
+              <div style={{ width:8,height:8,borderRadius:'50%',background:'#f59e0b',boxShadow:'0 0 8px #f59e0b' }} />
+              <span style={{ fontSize:13,fontWeight:700 }}>Link click +42% ↑</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── How it works ─────────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 32px', background: '#fff' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: '#aaa', textTransform: 'uppercase' }}>Cách hoạt động</span>
-            <h2 style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1.5, color: '#0a0a0a', marginTop: 10 }}>3 bước đơn giản</h2>
+      {/* ── Platform logos marquee ──────────────────────────────────────────── */}
+      <div style={{ borderTop:'1px solid rgba(255,255,255,.06)',borderBottom:'1px solid rgba(255,255,255,.06)',padding:'28px 0',overflow:'hidden',background:'rgba(255,255,255,.02)' }}>
+        <div style={{ display:'flex',animation:'marquee 20s linear infinite',width:'max-content',gap:0 }}>
+          {[...PLAT_ICONS,...PLAT_ICONS].map((Icon,i) => (
+            <div key={i} style={{ display:'flex',alignItems:'center',gap:10,padding:'0 32px',color:'rgba(255,255,255,.3)',flexShrink:0 }}>
+              <Icon size={20} color={PLAT_COLORS[i % PLAT_COLORS.length]} style={{ opacity:.6 }} />
+              <span style={{ fontSize:13,fontWeight:700,letterSpacing:.5 }}>
+                {['Instagram','TikTok','YouTube','Facebook','Spotify','GitHub','Telegram','WhatsApp','X (Twitter)','Threads'][i % 10]}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Stats ───────────────────────────────────────────────────────────── */}
+      <section style={{ padding:'80px 40px',background:'linear-gradient(180deg,#070709 0%,#0f0f16 100%)' }}>
+        <div style={{ maxWidth:800,margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:40 }}>
+          <StatCard n={1000} suffix="+" label="Creators đang dùng" />
+          <StatCard n={30}   suffix="+"  label="Templates đẹp" />
+          <StatCard n={19}   suffix=""   label="Layout options" />
+          <StatCard n={2}    suffix=" phút" label="Để tạo trang bio" />
+        </div>
+      </section>
+
+      {/* ── Features ────────────────────────────────────────────────────────── */}
+      <section style={{ padding:'100px 40px',background:'#0f0f16' }}>
+        <div style={{ maxWidth:1080,margin:'0 auto' }}>
+          <div style={{ textAlign:'center',marginBottom:64 }}>
+            <div style={{ fontSize:12,fontWeight:700,letterSpacing:4,color:'rgba(255,255,255,.3)',textTransform:'uppercase',marginBottom:16 }}>Tính năng</div>
+            <h2 style={{ fontSize:'clamp(32px,4vw,52px)',fontWeight:900,color:'#fff',marginBottom:16 }}>Mọi thứ bạn cần</h2>
+            <p style={{ fontSize:17,color:'rgba(255,255,255,.4)',maxWidth:480,margin:'0 auto' }}>12 tính năng được thiết kế để bio page của bạn nổi bật và hiệu quả nhất.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 20 }}>
-            {STEPS.map((s, i) => (
-              <div key={s.n} className="step-card" style={{
-                padding: '36px 28px', borderRadius: 24,
-                background: i === 1 ? '#333A2F' : '#EBEDDF',
-                border: '1px solid ' + (i === 1 ? 'transparent' : 'rgba(51,58,47,.1)'),
+          <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:12 }}>
+            {FEATURES.map(f => (
+              <div key={f.title} className="feat-item" style={{
+                padding:'22px 20px',borderRadius:20,
+                background:'rgba(255,255,255,.03)',
+                border:'1px solid rgba(255,255,255,.07)',
+                cursor:'default',
               }}>
-                <div className="step-num" style={{ fontSize: 44, marginBottom: 16 }}>{s.emoji}</div>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: i === 1 ? 'rgba(235,237,223,.5)' : 'rgba(51,58,47,.45)', textTransform: 'uppercase', marginBottom: 8 }}>Bước {s.n}</div>
-                <p style={{ fontSize: 18, fontWeight: 800, color: i === 1 ? '#EBEDDF' : '#333A2F', marginBottom: 8, letterSpacing: -0.3 }}>{s.title}</p>
-                <p style={{ fontSize: 14, color: i === 1 ? 'rgba(235,237,223,.7)' : '#666', lineHeight: 1.6 }}>{s.desc}</p>
+                <div style={{ fontSize:30,marginBottom:12 }}>{f.emoji}</div>
+                <div style={{ display:'flex',alignItems:'center',gap:8,marginBottom:6 }}>
+                  <p style={{ fontWeight:800,fontSize:14,color:'#fff' }}>{f.title.replace(/ Pro\.$|\.$/,'')}</p>
+                  {f.pro && <span className="pro-badge">PRO</span>}
+                </div>
+                <p style={{ fontSize:13,color:'rgba(255,255,255,.4)',lineHeight:1.6 }}>{f.desc.replace(/ Pro\.$|\.$/,'')}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Testimonials ──────────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 32px', background: '#fafaf8' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: '#aaa', textTransform: 'uppercase' }}>Testimonials</span>
-            <h2 style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1.5, color: '#0a0a0a', marginTop: 10 }}>Được yêu thích bởi creators</h2>
+      {/* ── How it works ────────────────────────────────────────────────────── */}
+      <section style={{ padding:'100px 40px',background:'#070709' }}>
+        <div style={{ maxWidth:900,margin:'0 auto' }}>
+          <div style={{ textAlign:'center',marginBottom:64 }}>
+            <div style={{ fontSize:12,fontWeight:700,letterSpacing:4,color:'rgba(255,255,255,.3)',textTransform:'uppercase',marginBottom:16 }}>Cách hoạt động</div>
+            <h2 style={{ fontSize:'clamp(32px,4vw,52px)',fontWeight:900,color:'#fff' }}>3 bước đơn giản</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 16 }}>
+          <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:20 }}>
+            {[
+              { n:'01',emoji:'🚀',title:'Đăng ký miễn phí',   desc:'Tạo tài khoản trong 10 giây, không cần thẻ ngân hàng hay điều kiện gì.',dark:false },
+              { n:'02',emoji:'🎨',title:'Tùy chỉnh trang bio',desc:'Chọn template, thêm links, âm nhạc, contact form, testimonials…',dark:true },
+              { n:'03',emoji:'✨',title:'Chia sẻ link của bạn',desc:'Một URL duy nhất — paste vào Instagram bio, TikTok, danh thiếp…',dark:false },
+            ].map(s => (
+              <div key={s.n} style={{
+                padding:'36px 30px',borderRadius:24,
+                background: s.dark ? 'linear-gradient(135deg,rgba(99,102,241,.2),rgba(236,72,153,.1))' : 'rgba(255,255,255,.04)',
+                border: s.dark ? '1px solid rgba(99,102,241,.3)' : '1px solid rgba(255,255,255,.07)',
+              }}>
+                <div style={{ fontSize:42,marginBottom:16 }}>{s.emoji}</div>
+                <div style={{ fontSize:11,fontWeight:700,letterSpacing:2,color:'rgba(255,255,255,.25)',textTransform:'uppercase',marginBottom:8 }}>Bước {s.n}</div>
+                <p style={{ fontSize:18,fontWeight:800,color:'#fff',marginBottom:10 }}>{s.title}</p>
+                <p style={{ fontSize:14,color:'rgba(255,255,255,.45)',lineHeight:1.7 }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ────────────────────────────────────────────────────── */}
+      <section style={{ padding:'100px 40px',background:'#0f0f16' }}>
+        <div style={{ maxWidth:1080,margin:'0 auto' }}>
+          <div style={{ textAlign:'center',marginBottom:64 }}>
+            <div style={{ fontSize:12,fontWeight:700,letterSpacing:4,color:'rgba(255,255,255,.3)',textTransform:'uppercase',marginBottom:16 }}>Testimonials</div>
+            <h2 style={{ fontSize:'clamp(32px,4vw,52px)',fontWeight:900,color:'#fff',marginBottom:12 }}>Được yêu thích bởi creators</h2>
+            <div style={{ display:'flex',gap:2,justifyContent:'center' }}>
+              {[1,2,3,4,5].map(n => <Star key={n} size={18} fill="#f59e0b" style={{ color:'#f59e0b' }} />)}
+              <span style={{ fontSize:15,fontWeight:700,color:'rgba(255,255,255,.5)',marginLeft:8 }}>5.0 / 5</span>
+            </div>
+          </div>
+          <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:16 }}>
             {TESTIMONIALS.map(t => (
-              <div key={t.name} style={{
-                padding: '24px', borderRadius: 20, background: '#fff',
-                border: '1px solid #f0f0f0', boxShadow: '0 4px 24px rgba(0,0,0,.04)',
-              }}>
-                <div style={{ display: 'flex', gap: 1, marginBottom: 14 }}>
-                  {[1,2,3,4,5].map(n => <Star key={n} size={13} fill="#f59e0b" style={{ color: '#f59e0b' }} />)}
+              <div key={t.name} style={{ padding:'24px',borderRadius:20,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.08)' }}>
+                <div style={{ display:'flex',gap:2,marginBottom:14 }}>
+                  {[1,2,3,4,5].map(n => <Star key={n} size={13} fill="#f59e0b" style={{ color:'#f59e0b' }} />)}
                 </div>
-                <p style={{ fontSize: 14, color: '#444', lineHeight: 1.7, marginBottom: 18, fontStyle: 'italic' }}>"{t.text}"</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 12, flexShrink: 0 }}>
+                <p style={{ fontSize:14,color:'rgba(255,255,255,.6)',lineHeight:1.75,marginBottom:20,fontStyle:'italic' }}>"{t.text}"</p>
+                <div style={{ display:'flex',alignItems:'center',gap:12 }}>
+                  <div style={{ width:38,height:38,borderRadius:'50%',background:t.color,display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:13,flexShrink:0 }}>
                     {t.avatar}
                   </div>
                   <div>
-                    <p style={{ fontWeight: 700, fontSize: 13, color: '#111' }}>{t.name}</p>
-                    <p style={{ fontSize: 11, color: '#aaa', fontWeight: 600 }}>{t.role}</p>
+                    <p style={{ fontWeight:700,fontSize:14,color:'#fff' }}>{t.name}</p>
+                    <p style={{ fontSize:12,color:'rgba(255,255,255,.35)',fontWeight:600 }}>{t.role}</p>
                   </div>
                 </div>
               </div>
@@ -370,65 +451,73 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── Pricing ───────────────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 32px', background: '#fff' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: '#aaa', textTransform: 'uppercase' }}>Pricing</span>
-            <h2 style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1.5, color: '#0a0a0a', marginTop: 10 }}>Đơn giản. Minh bạch.</h2>
+      {/* ── Pricing ─────────────────────────────────────────────────────────── */}
+      <section style={{ padding:'100px 40px',background:'#070709' }}>
+        <div style={{ maxWidth:820,margin:'0 auto' }}>
+          <div style={{ textAlign:'center',marginBottom:64 }}>
+            <div style={{ fontSize:12,fontWeight:700,letterSpacing:4,color:'rgba(255,255,255,.3)',textTransform:'uppercase',marginBottom:16 }}>Pricing</div>
+            <h2 style={{ fontSize:'clamp(32px,4vw,52px)',fontWeight:900,color:'#fff',marginBottom:12 }}>Đơn giản. Minh bạch.</h2>
+            <p style={{ fontSize:16,color:'rgba(255,255,255,.4)' }}>Bắt đầu miễn phí, nâng cấp khi bạn sẵn sàng.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 20 }}>
+          <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(320px,1fr))',gap:20,alignItems:'start' }}>
             {/* Free */}
-            <div style={{ padding: 32, borderRadius: 28, border: '2px solid #e5e7eb', background: '#fff' }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: 32, fontWeight: 900, color: '#111' }}>Free</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 20 }}>
-                <span style={{ fontSize: 40, fontWeight: 900, color: '#333A2F' }}>0₫</span>
-                <span style={{ color: '#aaa', fontSize: 14 }}>/mãi mãi</span>
-              </div>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0, marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {FREE_FEATURES.map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: '#444' }}>
-                    <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Check size={11} style={{ color: '#16a34a' }} />
+            <div style={{ padding:'36px',borderRadius:28,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.1)' }}>
+              <div style={{ marginBottom:8,fontSize:14,fontWeight:700,color:'rgba(255,255,255,.4)',textTransform:'uppercase',letterSpacing:2 }}>Free</div>
+              <div style={{ fontSize:48,fontWeight:900,color:'#fff',marginBottom:4 }}>0₫</div>
+              <div style={{ fontSize:14,color:'rgba(255,255,255,.3)',marginBottom:28 }}>mãi mãi · không điều kiện</div>
+              <ul style={{ listStyle:'none',marginBottom:32,display:'flex',flexDirection:'column',gap:11 }}>
+                {FREE_F.map(f => (
+                  <li key={f} style={{ display:'flex',alignItems:'center',gap:10,fontSize:14,color:'rgba(255,255,255,.65)' }}>
+                    <div style={{ width:18,height:18,borderRadius:'50%',background:'rgba(99,102,241,.2)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
+                      <Check size={11} style={{ color:'#a5b4fc' }} />
                     </div>
                     {f}
                   </li>
                 ))}
               </ul>
-              <Link to="/login" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: 14, border: '2px solid #e5e7eb', fontWeight: 700, fontSize: 15, color: '#333A2F', textDecoration: 'none', transition: 'all .2s' }}
-                onMouseEnter={e => { (e.target as HTMLElement).style.borderColor = '#333A2F'; (e.target as HTMLElement).style.background = '#EBEDDF' }}
-                onMouseLeave={e => { (e.target as HTMLElement).style.borderColor = '#e5e7eb'; (e.target as HTMLElement).style.background = '#fff' }}>
+              <Link to="/login" style={{
+                display:'block',textAlign:'center',padding:'14px',borderRadius:14,
+                border:'1px solid rgba(255,255,255,.15)',fontWeight:700,fontSize:15,color:'rgba(255,255,255,.8)',
+                transition:'all .2s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background='rgba(255,255,255,.08)'; e.currentTarget.style.color='#fff' }}
+                onMouseLeave={e => { e.currentTarget.style.background=''; e.currentTarget.style.color='rgba(255,255,255,.8)' }}>
                 Bắt đầu miễn phí
               </Link>
             </div>
+
             {/* Pro */}
-            <div style={{ padding: 32, borderRadius: 28, border: '2px solid #333A2F', background: '#333A2F', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg,#f59e0b,#f97316,#ef4444)' }} />
-              <div style={{ position: 'absolute', top: 20, right: 20, background: '#f59e0b', borderRadius: 99, padding: '4px 12px', fontSize: 11, fontWeight: 900, color: '#000', letterSpacing: 1.5, textTransform: 'uppercase' }}>
-                ✦ PRO
+            <div style={{ padding:'36px',borderRadius:28,position:'relative',overflow:'hidden',background:'linear-gradient(160deg,rgba(99,102,241,.15) 0%,rgba(236,72,153,.1) 50%,rgba(245,158,11,.08) 100%)',border:'1px solid rgba(99,102,241,.3)' }}>
+              {/* Top shimmer bar */}
+              <div style={{ position:'absolute',top:0,left:0,right:0,height:3,background:'linear-gradient(90deg,#6366f1,#ec4899,#f59e0b)' }} />
+              <div style={{ position:'absolute',top:24,right:24 }}>
+                <span className="pro-badge">✦ PRO</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
-                <span style={{ fontSize: 32, fontWeight: 900, color: '#EBEDDF' }}>Pro</span>
+
+              <div style={{ marginBottom:8,fontSize:14,fontWeight:700,color:'rgba(255,255,255,.4)',textTransform:'uppercase',letterSpacing:2 }}>Pro</div>
+              <div style={{ display:'flex',alignItems:'baseline',gap:4,marginBottom:4 }}>
+                <span style={{ fontSize:48,fontWeight:900,color:'#fff' }}>149K</span>
+                <span style={{ fontSize:16,color:'rgba(255,255,255,.4)',fontWeight:600 }}>₫/tháng</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 20 }}>
-                <span style={{ fontSize: 40, fontWeight: 900, color: '#f59e0b' }}>149.000₫</span>
-                <span style={{ color: 'rgba(235,237,223,.5)', fontSize: 14 }}>/tháng</span>
-              </div>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0, marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {PRO_FEATURES.map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: 'rgba(235,237,223,.85)' }}>
-                    <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(245,158,11,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Check size={11} style={{ color: '#f59e0b' }} />
+              <div style={{ fontSize:14,color:'rgba(255,255,255,.3)',marginBottom:28 }}>~5,000₫/ngày</div>
+
+              <ul style={{ listStyle:'none',marginBottom:32,display:'flex',flexDirection:'column',gap:11 }}>
+                {PRO_F.map(f => (
+                  <li key={f} style={{ display:'flex',alignItems:'center',gap:10,fontSize:14,color:'rgba(255,255,255,.75)' }}>
+                    <div style={{ width:18,height:18,borderRadius:'50%',background:'rgba(245,158,11,.2)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
+                      <Check size={11} style={{ color:'#fbbf24' }} />
                     </div>
                     {f}
                   </li>
                 ))}
               </ul>
-              <Link to="/pricing" style={{ display: 'block', textAlign: 'center', padding: '13px', borderRadius: 14, background: '#f59e0b', fontWeight: 800, fontSize: 15, color: '#000', textDecoration: 'none', transition: 'all .2s' }}
-                onMouseEnter={e => { (e.target as HTMLElement).style.background = '#fbbf24' }}
-                onMouseLeave={e => { (e.target as HTMLElement).style.background = '#f59e0b' }}>
+              <Link to="/pricing" style={{
+                display:'block',textAlign:'center',padding:'14px',borderRadius:14,
+                background:'linear-gradient(135deg,#6366f1,#ec4899)',fontWeight:800,fontSize:15,color:'#fff',
+                boxShadow:'0 8px 32px rgba(99,102,241,.4)',transition:'all .2s',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform='translateY(-1px)'; e.currentTarget.style.boxShadow='0 12px 40px rgba(99,102,241,.5)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 8px 32px rgba(99,102,241,.4)' }}>
                 Nâng cấp PRO ngay →
               </Link>
             </div>
@@ -436,57 +525,68 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── Final CTA ─────────────────────────────────────────────────────────── */}
-      <section style={{
-        margin: '0 32px 80px', borderRadius: 32,
-        background: 'linear-gradient(135deg,#333A2F 0%,#4a5e3a 50%,#2d4a3e 100%)',
-        padding: '80px 40px', textAlign: 'center',
-        overflow: 'hidden', position: 'relative',
-      }}>
-        {/* Background decoration */}
-        <div style={{ position: 'absolute', top: -80, right: -80, width: 300, height: 300, borderRadius: '50%', background: 'rgba(245,158,11,.08)' }} />
-        <div style={{ position: 'absolute', bottom: -60, left: -60, width: 200, height: 200, borderRadius: '50%', background: 'rgba(99,102,241,.08)' }} />
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🚀</div>
-          <h2 style={{ fontSize: 44, fontWeight: 900, color: '#EBEDDF', letterSpacing: -1.5, marginBottom: 16, lineHeight: 1.1 }}>
-            Bắt đầu ngay hôm nay.
-            <br />
-            <span style={{ color: '#f59e0b' }}>Miễn phí mãi mãi.</span>
-          </h2>
-          <p style={{ fontSize: 17, color: 'rgba(235,237,223,.65)', marginBottom: 36, maxWidth: 440, margin: '0 auto 36px' }}>
-            Không cần thẻ ngân hàng. Tạo trang bio đẹp trong vòng 2 phút và bắt đầu nhận traffic ngay hôm nay.
-          </p>
-          <Link to="/login" style={{
-            display: 'inline-flex', alignItems: 'center', gap: 10,
-            background: '#f59e0b', color: '#000', fontWeight: 900,
-            padding: '16px 36px', borderRadius: 16, fontSize: 17,
-            textDecoration: 'none', transition: 'all .2s',
-            boxShadow: '0 8px 32px rgba(245,158,11,.4)',
-          }}
-            onMouseEnter={e => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 16px 48px rgba(245,158,11,.5)' }}
-            onMouseLeave={e => { (e.target as HTMLElement).style.transform = ''; (e.target as HTMLElement).style.boxShadow = '0 8px 32px rgba(245,158,11,.4)' }}>
-            Tạo trang DONLY của bạn <ArrowRight size={20} />
-          </Link>
-          <p style={{ marginTop: 20, fontSize: 13, color: 'rgba(235,237,223,.4)', fontWeight: 600 }}>
-            ✓ Miễn phí  ·  ✓ Không giới hạn links  ·  ✓ Không cần credit card
-          </p>
+      {/* ── Final CTA ───────────────────────────────────────────────────────── */}
+      <section style={{ padding:'0 40px 80px' }}>
+        <div style={{
+          maxWidth:960,margin:'0 auto',
+          borderRadius:32,overflow:'hidden',
+          position:'relative',
+          background:'linear-gradient(135deg,rgba(99,102,241,.2) 0%,rgba(236,72,153,.15) 50%,rgba(245,158,11,.1) 100%)',
+          border:'1px solid rgba(255,255,255,.1)',
+          padding:'80px 40px',
+          textAlign:'center',
+        }}>
+          <div style={{ position:'absolute',top:-100,left:-100,width:400,height:400,borderRadius:'50%',background:'radial-gradient(circle,rgba(99,102,241,.15) 0%,transparent 70%)',pointerEvents:'none' }} />
+          <div style={{ position:'absolute',bottom:-80,right:-80,width:350,height:350,borderRadius:'50%',background:'radial-gradient(circle,rgba(236,72,153,.12) 0%,transparent 70%)',pointerEvents:'none' }} />
+          <div style={{ position:'relative',zIndex:1 }}>
+            <div style={{ fontSize:52,marginBottom:20 }}>🚀</div>
+            <h2 style={{ fontSize:'clamp(32px,4vw,56px)',fontWeight:900,color:'#fff',marginBottom:16,letterSpacing:-2 }}>
+              Bắt đầu ngay hôm nay.
+              <br />
+              <span style={{
+                background:'linear-gradient(135deg,#a5b4fc,#f472b6,#fb923c)',
+                WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text',
+              }}>Miễn phí mãi mãi.</span>
+            </h2>
+            <p style={{ fontSize:17,color:'rgba(255,255,255,.45)',marginBottom:40,maxWidth:420,margin:'0 auto 40px' }}>
+              Không cần thẻ ngân hàng. Tạo trang bio đẹp trong vòng 2 phút và bắt đầu nhận traffic ngay.
+            </p>
+            <Link to="/login" style={{
+              display:'inline-flex',alignItems:'center',gap:12,
+              background:'#fff',color:'#0a0a0a',fontWeight:900,
+              padding:'18px 40px',borderRadius:16,fontSize:17,
+              boxShadow:'0 8px 40px rgba(255,255,255,.25)',transition:'all .2s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 16px 60px rgba(255,255,255,.35)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 8px 40px rgba(255,255,255,.25)' }}>
+              Tạo trang DONLY của bạn <ChevronRight size={20} />
+            </Link>
+            <p style={{ marginTop:20,fontSize:13,color:'rgba(255,255,255,.25)',fontWeight:600 }}>
+              ✓ Miễn phí · ✓ Không giới hạn links · ✓ Không cần credit card
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* ── Footer ─────────────────────────────────────────────────────────────── */}
-      <footer style={{ borderTop: '1px solid #f0f0f0', padding: '32px', textAlign: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: '#333A2F', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: '#EBEDDF', fontWeight: 900, fontSize: 13 }}>D</span>
+      {/* ── Footer ──────────────────────────────────────────────────────────── */}
+      <footer style={{ borderTop:'1px solid rgba(255,255,255,.06)',padding:'32px 40px',display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:16 }}>
+        <div style={{ display:'flex',alignItems:'center',gap:8 }}>
+          <div style={{ width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,#333A2F,#5a7a4a)',display:'flex',alignItems:'center',justifyContent:'center' }}>
+            <span style={{ color:'#EBEDDF',fontWeight:900,fontSize:13 }}>D</span>
           </div>
-          <span style={{ fontWeight: 800, color: '#333A2F' }}>DONLY</span>
+          <span style={{ fontWeight:800,color:'rgba(255,255,255,.7)',fontSize:14 }}>DONLY</span>
+          <span style={{ fontSize:13,color:'rgba(255,255,255,.25)' }}>© 2026</span>
         </div>
-        <p style={{ fontSize: 13, color: '#aaa' }}>© 2026 DONLY · Trang bio đẹp nhất cho người Việt 🇻🇳</p>
-        <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: 12 }}>
-          {['Đăng nhập', 'Tính năng', 'Pricing'].map(l => (
-            <Link key={l} to={l === 'Pricing' ? '/pricing' : '/login'} style={{ fontSize: 13, color: '#aaa', textDecoration: 'none', fontWeight: 500 }}>{l}</Link>
+        <div style={{ display:'flex',gap:24 }}>
+          {['Đăng nhập','Pricing'].map(l => (
+            <Link key={l} to={l==='Pricing'?'/pricing':'/login'} style={{ fontSize:13,color:'rgba(255,255,255,.3)',fontWeight:600,transition:'color .2s' }}
+              onMouseEnter={e => { e.currentTarget.style.color='rgba(255,255,255,.7)' }}
+              onMouseLeave={e => { e.currentTarget.style.color='rgba(255,255,255,.3)' }}>
+              {l}
+            </Link>
           ))}
         </div>
+        <p style={{ fontSize:13,color:'rgba(255,255,255,.2)',fontWeight:600 }}>Trang bio đẹp nhất cho người Việt 🇻🇳</p>
       </footer>
     </div>
   )
