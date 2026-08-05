@@ -332,7 +332,7 @@ export default function Pricing() {
                   <p className="text-xs text-gray-400">duyphan925@gmail.com</p>
                 </div>
               </a>
-              <a href="https://zalo.me/0000000000" target="_blank" rel="noreferrer"
+              <a href="https://zalo.me/0344697253" target="_blank" rel="noreferrer"
                 className="flex items-center gap-3 px-4 py-3.5 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
                   <MessageCircle size={16} className="text-blue-500" />
