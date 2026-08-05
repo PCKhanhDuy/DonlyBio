@@ -1,520 +1,365 @@
 import { Link } from 'react-router-dom'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import {
-  ArrowRight, BarChart2, Palette, Music2, MessageSquare,
-  QrCode, Link2, Globe, Zap, Users, Star, Check, Shield, Layers,
-} from 'lucide-react'
-import {
-  SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiSpotify,
-  SiGithub, SiTelegram, SiWhatsapp, SiX, SiThreads,
-} from 'react-icons/si'
+import { Check, ArrowRight, Star, BarChart2, Palette, Music2, MessageSquare, QrCode, Zap, Globe, Shield, Layers, Users } from 'lucide-react'
+import { SiInstagram, SiTiktok, SiYoutube, SiFacebook, SiSpotify, SiGithub, SiTelegram, SiWhatsapp, SiX, SiThreads } from 'react-icons/si'
 
-// ─── Scroll fade-in wrapper ────────────────────────────────────────────────────
-function FadeUp({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
+// ─── Constants ────────────────────────────────────────────────────────────────
+const ACCENT = '#5B6AD0'
+
+function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const visible = useInView(ref, { once: true, margin: '-60px' })
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 28 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className={className}
-    >
+    <motion.div ref={ref}
+      initial={{ opacity: 0, y: 22 }}
+      animate={visible ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.55, delay, ease: [0.22, 0.61, 0.36, 1] }}>
       {children}
     </motion.div>
   )
 }
 
-// ─── Section label ─────────────────────────────────────────────────────────────
-function Label({ children }: { children: React.ReactNode }) {
-  return (
-    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', color: 'rgba(255,255,255,.3)', textTransform: 'uppercase', marginBottom: 18 }}>
-      {children}
-    </p>
-  )
-}
-
-// ─── Phone mockup ──────────────────────────────────────────────────────────────
-function PhoneMockup() {
-  const links = [
-    { color: '#E1306C', label: 'Instagram', w: 90 },
-    { color: '#010101', label: 'TikTok', w: 70 },
-    { color: '#FF0000', label: 'YouTube', w: 80 },
-    { color: '#6366f1', label: 'Portfolio', w: 100 },
-  ]
+// ─── Phone preview ────────────────────────────────────────────────────────────
+function BioPreview() {
   return (
     <div style={{
-      width: 258, height: 530, borderRadius: 48, flexShrink: 0,
-      background: '#0a0a10',
-      boxShadow: '0 0 0 2px rgba(255,255,255,.12), 0 0 0 4px rgba(255,255,255,.04), 0 80px 120px rgba(0,0,0,.8)',
-      overflow: 'hidden', position: 'relative',
+      width: 220, height: 440,
+      background: '#0d0d0d',
+      borderRadius: 38,
+      border: '1.5px solid rgba(255,255,255,.14)',
+      boxShadow: '0 0 0 1px rgba(255,255,255,.04), 0 60px 100px rgba(0,0,0,.9)',
+      overflow: 'hidden',
+      position: 'relative',
+      flexShrink: 0,
     }}>
-      {/* Top notch */}
-      <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', width: 90, height: 9, background: '#111', borderRadius: 99, zIndex: 10 }} />
-      {/* Gradient overlay at top */}
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% -20%, rgba(99,102,241,.25) 0%, transparent 60%)', pointerEvents: 'none' }} />
-
-      <div style={{ padding: '44px 18px 22px', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 11 }}>
-        {/* Avatar */}
-        <div style={{ position: 'relative' }}>
-          <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', background: 'conic-gradient(from 0deg,#6366f1,#ec4899,#f59e0b,#6366f1)', opacity: .7, filter: 'blur(4px)' }} />
-          <div style={{ position: 'relative', width: 64, height: 64, borderRadius: '50%', background: 'linear-gradient(135deg,#6366f1,#ec4899)', border: '2px solid rgba(0,0,0,.4)' }} />
-        </div>
-
-        {/* Name bars */}
-        <div style={{ height: 10, width: 120, background: 'rgba(255,255,255,.88)', borderRadius: 99 }} />
-        <div style={{ height: 7, width: 80, background: 'rgba(255,255,255,.28)', borderRadius: 99 }} />
-
-        {/* Social dots row */}
-        <div style={{ display: 'flex', gap: 7, paddingBottom: 4 }}>
+      <div style={{ position: 'absolute', top: 13, left: '50%', transform: 'translateX(-50%)', width: 72, height: 7, background: '#000', borderRadius: 99, zIndex: 5 }} />
+      <div style={{ padding: '38px 16px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, height: '100%' }}>
+        <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg,#5B6AD0,#8b92e0)', border: '2px solid rgba(255,255,255,.1)', flexShrink: 0 }} />
+        <div style={{ height: 9, width: 100, background: 'rgba(255,255,255,.85)', borderRadius: 99 }} />
+        <div style={{ height: 6, width: 68, background: 'rgba(255,255,255,.22)', borderRadius: 99 }} />
+        <div style={{ display: 'flex', gap: 6, marginBottom: 2 }}>
           {['#E1306C', '#010101', '#FF0000', '#1DA1F2'].map((c, i) => (
-            <div key={i} style={{ width: 22, height: 22, borderRadius: 8, background: c }} />
+            <div key={i} style={{ width: 20, height: 20, borderRadius: 6, background: c, opacity: .8 }} />
           ))}
         </div>
-
-        {/* Link cards */}
-        {links.map((l, i) => (
-          <motion.div
-            key={l.label}
-            initial={{ opacity: 0, x: -12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
-            style={{
-              width: 210, height: 40, borderRadius: 13,
-              background: `linear-gradient(90deg, ${l.color}20, rgba(255,255,255,.03))`,
-              border: `1px solid ${l.color}35`,
-              display: 'flex', alignItems: 'center', paddingLeft: 14, gap: 10,
-            }}
-          >
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: l.color, boxShadow: `0 0 8px ${l.color}` }} />
-            <div style={{ height: 7, width: l.w, background: 'rgba(255,255,255,.5)', borderRadius: 99 }} />
-          </motion.div>
+        {[{ w: 90 }, { w: 76 }, { w: 84 }, { w: 70 }].map((l, i) => (
+          <div key={i} style={{
+            width: 180, height: 36, borderRadius: 10,
+            background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)',
+            display: 'flex', alignItems: 'center', paddingLeft: 14, gap: 9,
+          }}>
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: ACCENT, opacity: .7 }} />
+            <div style={{ height: 6, width: l.w, background: 'rgba(255,255,255,.4)', borderRadius: 99 }} />
+          </div>
         ))}
-
-        {/* Music player */}
-        <div style={{ width: 210, borderRadius: 13, background: 'rgba(30,215,96,.07)', border: '1px solid rgba(30,215,96,.22)', padding: '10px 14px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 24, height: 24, borderRadius: 6, background: '#1ED760', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="9" height="11" viewBox="0 0 9 11" fill="none"><path d="M0 0L9 5.5L0 11V0Z" fill="black" /></svg>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ height: 6, width: 80, background: 'rgba(255,255,255,.6)', borderRadius: 99, marginBottom: 5 }} />
-              <div style={{ height: 3, background: 'rgba(30,215,96,.35)', borderRadius: 99, position: 'relative' }}>
-                <div style={{ position: 'absolute', left: 0, top: 0, width: '40%', height: '100%', background: '#1ED760', borderRadius: 99 }} />
-              </div>
+        <div style={{ width: 180, borderRadius: 10, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)', padding: '9px 14px', display: 'flex', alignItems: 'center', gap: 9 }}>
+          <div style={{ width: 22, height: 22, borderRadius: 6, background: '#1ED760', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <svg width="8" height="10" viewBox="0 0 8 10"><path d="M0 0L8 5L0 10Z" fill="#000" /></svg>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ height: 5, width: 72, background: 'rgba(255,255,255,.5)', borderRadius: 99, marginBottom: 4 }} />
+            <div style={{ height: 3, background: 'rgba(255,255,255,.1)', borderRadius: 99 }}>
+              <div style={{ width: '38%', height: '100%', background: '#1ED760', borderRadius: 99 }} />
             </div>
           </div>
         </div>
-
-        {/* Bottom url */}
-        <div style={{ marginTop: 'auto', padding: '5px 14px', borderRadius: 8, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.07)' }}>
-          <span style={{ fontSize: 9, color: 'rgba(255,255,255,.3)', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' }}>donlybio.vercel.app/u/you</span>
+        <div style={{ marginTop: 'auto', padding: '4px 12px', borderRadius: 7, background: 'rgba(255,255,255,.03)' }}>
+          <span style={{ fontSize: 8, color: 'rgba(255,255,255,.22)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>donlybio.vercel.app</span>
         </div>
       </div>
     </div>
   )
 }
 
-// ─── Bento feature card ─────────────────────────────────────────────────────────
-function BentoCard({
-  icon: Icon, title, desc, accent = '#6366f1', span = 1, tall = false, children,
-}: {
-  icon: React.ElementType; title: string; desc: string; accent?: string; span?: number; tall?: boolean; children?: React.ReactNode
-}) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.015, borderColor: `${accent}55` }}
-      transition={{ duration: 0.2 }}
-      style={{
-        borderRadius: 20, padding: '28px 26px',
-        background: 'rgba(255,255,255,.03)',
-        border: '1px solid rgba(255,255,255,.08)',
-        gridColumn: `span ${span}`,
-        minHeight: tall ? 240 : 170,
-        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-        position: 'relative', overflow: 'hidden', cursor: 'default',
-      }}
-    >
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${accent}50, transparent)` }} />
-      <div>
-        <div style={{ width: 38, height: 38, borderRadius: 11, background: `${accent}18`, border: `1px solid ${accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
-          <Icon size={18} color={accent} />
-        </div>
-        <p style={{ fontWeight: 800, fontSize: 15, color: '#fff', marginBottom: 7 }}>{title}</p>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,.4)', lineHeight: 1.65 }}>{desc}</p>
-      </div>
-      {children}
-    </motion.div>
-  )
+// ─── Platforms ────────────────────────────────────────────────────────────────
+const PLATFORMS: [React.ElementType, string, string][] = [
+  [SiInstagram, '#E1306C', 'Instagram'], [SiTiktok, '#fff', 'TikTok'],
+  [SiYoutube, '#FF0000', 'YouTube'], [SiFacebook, '#1877F2', 'Facebook'],
+  [SiSpotify, '#1ED760', 'Spotify'], [SiGithub, '#fff', 'GitHub'],
+  [SiTelegram, '#229ED9', 'Telegram'], [SiWhatsapp, '#25D366', 'WhatsApp'],
+  [SiX, '#fff', 'X (Twitter)'], [SiThreads, '#fff', 'Threads'],
+]
+
+// ─── Features ─────────────────────────────────────────────────────────────────
+const FEATURES = [
+  { icon: Palette,        title: 'Templates & Themes',    desc: '30+ template được thiết kế chuyên nghiệp, 19 layout — từ Minimal đến Magazine.' },
+  { icon: BarChart2,      title: 'Analytics chi tiết',    desc: 'Theo dõi views, clicks và CTR theo ngày. Dashboard đơn giản, không cần tool thứ ba.' },
+  { icon: Music2,         title: 'Music Player',          desc: 'Nhúng Spotify hoặc YouTube trực tiếp vào trang bio. Visitor nghe nhạc mà không cần rời trang.' },
+  { icon: MessageSquare,  title: 'Contact Form & Inbox',  desc: 'Visitor nhắn tin thẳng, bạn quản lý trong Dashboard. Không cần email hay Messenger.' },
+  { icon: QrCode,         title: 'QR Code tự động',       desc: 'Mỗi trang bio có QR riêng, tải PNG để dùng in ấn, standee hoặc danh thiếp.' },
+  { icon: Globe,          title: 'GitHub Stats',          desc: 'Card thống kê GitHub live — repos, followers, bio — tự cập nhật theo profile thật.' },
+  { icon: Zap,            title: 'Links nâng cao',        desc: 'Schedule bật/tắt theo lịch, hiệu ứng animation, VCard download 1 chạm.' },
+  { icon: Shield,         title: 'Bảo vệ trang',         desc: 'Đặt mật khẩu cho trang bio, phù hợp nội dung giới hạn đối tượng truy cập.' },
+  { icon: Layers,         title: 'Custom CSS',            desc: 'Toàn quyền tùy biến giao diện bằng CSS — dành cho designer và developer.' },
+]
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+const TESTIMONIALS = [
+  { name: 'Minh Khoa',  role: 'Content Creator',    text: 'Profile mình trông chuyên nghiệp hơn hẳn. Khách hàng tự hỏi dùng tool gì để làm đẹp vậy.' },
+  { name: 'Thu Hương',  role: 'Freelance Designer',  text: 'Music player là tính năng tôi dùng nhiều nhất. Fan nghe nhạc ngay trên bio, không cần mở app khác.' },
+  { name: 'Anh Tú',    role: 'Photographer',        text: 'Layout Gallery hiển thị portfolio rất đẹp. Lần đầu tôi thấy một bio link làm được điều này.' },
+  { name: 'Linh Chi',  role: 'Musician',            text: 'Thời gian khách ở lại trang bio tăng gấp đôi sau khi tích hợp Spotify embed.' },
+  { name: 'Duy Phong', role: 'YouTuber',            text: 'Analytics cho tôi biết chính xác hôm nào traffic cao và link nào đang được click nhiều nhất.' },
+  { name: 'Hà My',     role: 'KOL & Influencer',    text: 'Templates Pro đẹp và chuyên nghiệp. Brand tôi trông rất ổn mà không cần thuê designer riêng.' },
+]
+
+// ─── Pricing ──────────────────────────────────────────────────────────────────
+const PLANS = [
+  {
+    name: 'Starter',
+    desc: 'Dành cho cá nhân mới bắt đầu.',
+    monthly: 0,
+    yearly: 0,
+    cta: 'Bắt đầu miễn phí',
+    ctaLink: '/login',
+    highlight: false,
+    features: [
+      'Không giới hạn links',
+      '10 templates cơ bản',
+      '6 layout options',
+      'Analytics 7 ngày',
+      'QR code',
+      'Contact form & Inbox',
+      'Music player',
+      'GitHub Stats block',
+    ],
+  },
+  {
+    name: 'Creator',
+    desc: 'Dành cho creator muốn nổi bật.',
+    monthly: 149000,
+    yearly: 99000,
+    yearlyTotal: 1188000,
+    badge: 'Phổ biến nhất',
+    cta: 'Dùng thử 7 ngày',
+    ctaLink: '/pricing',
+    highlight: true,
+    features: [
+      'Tất cả tính năng Starter',
+      '30+ templates',
+      '13 layout options',
+      'Analytics 30 ngày',
+      'Testimonials block',
+      'VCard download',
+      'Link nâng cao & animation',
+      'Custom social icon bar',
+    ],
+  },
+  {
+    name: 'Pro',
+    desc: 'Dành cho brand và agency chuyên nghiệp.',
+    monthly: 399000,
+    yearly: 249000,
+    yearlyTotal: 2988000,
+    cta: 'Nâng cấp Pro',
+    ctaLink: '/pricing',
+    highlight: false,
+    features: [
+      'Tất cả tính năng Creator',
+      '4 templates PRO độc quyền',
+      '7 layouts PRO độc quyền',
+      'Analytics 90 ngày + CTR',
+      'Bảo vệ trang bằng mật khẩu',
+      'Custom CSS không giới hạn',
+      'Background image & gradient',
+      'Priority support',
+    ],
+  },
+]
+
+function fmt(n: number) {
+  if (n === 0) return '0₫'
+  return (n / 1000).toFixed(0) + 'K₫'
 }
 
-// ─── Platforms ──────────────────────────────────────────────────────────────────
-const PLATFORMS: [React.ElementType, string][] = [
-  [SiInstagram, '#E1306C'], [SiTiktok, '#fff'], [SiYoutube, '#FF0000'],
-  [SiFacebook, '#1877F2'], [SiSpotify, '#1ED760'], [SiGithub, '#fff'],
-  [SiTelegram, '#229ED9'], [SiWhatsapp, '#25D366'], [SiX, '#fff'], [SiThreads, '#fff'],
-]
-
-// ─── Testimonials ───────────────────────────────────────────────────────────────
-const TESTIMONIALS = [
-  { name: 'Minh Khoa', role: 'Content Creator', color: '#6366f1', text: 'Profile mình trông xịn hẳn sau khi dùng DONLY. Khách hàng cứ hỏi dùng tool design gì.' },
-  { name: 'Thu Hương', role: 'Freelance Designer', color: '#ec4899', text: 'Music player là tính năng yêu thích nhất. Fan nghe nhạc ngay trên bio mà không cần mở app khác.' },
-  { name: 'Anh Tú', role: 'Photographer', color: '#3b82f6', text: 'Layout Gallery hiển thị portfolio cực kỳ đẹp. Lần đầu thấy bio link có thể làm điều này.' },
-  { name: 'Linh Chi', role: 'Musician', color: '#10b981', text: 'Từ khi bật Spotify embed, thời gian khách ở lại trang bio của mình tăng gấp đôi.' },
-  { name: 'Duy Phong', role: 'YouTuber', color: '#f59e0b', text: 'Analytics giúp mình biết hôm nào traffic cao, content nào đang dẫn nhiều click nhất.' },
-  { name: 'Hà My', role: 'KOL / Influencer', color: '#ef4444', text: 'Templates PRO đẹp vô cùng. Brand mình trông professional mà không cần thuê designer.' },
-]
-
-const FREE_F = ['30+ templates & themes', '13 layout miễn phí', 'Không giới hạn links', 'Music player + QR code', 'Contact form + Inbox', 'Testimonials block', 'Analytics 7 & 30 ngày', 'VCard download', 'GitHub Stats block']
-const PRO_F = ['Tất cả tính năng Free', '4 templates PRO độc quyền', '7 layouts PRO độc quyền', 'Analytics 90 ngày + CTR', 'Bảo vệ trang bằng mật khẩu', 'Custom CSS không giới hạn', 'Background image / gradient', 'Announcement banner PRO']
-
-// ─── Main ──────────────────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function Landing() {
-  return (
-    <div style={{ background: '#060608', color: '#fff', overflowX: 'hidden', minHeight: '100vh', fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif' }}>
+  const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly')
 
-      {/* ── NAV ─────────────────────────────────────────────────────────── */}
+  return (
+    <div style={{ background: '#000', color: '#fff', overflowX: 'hidden', fontFamily: '-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif' }}>
+
+      {/* ── NAV ───────────────────────────────────────────────────────────── */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
-        height: 64, padding: '0 40px',
+        height: 60, padding: '0 32px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: 'rgba(6,6,8,.75)', backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255,255,255,.06)',
+        background: 'rgba(0,0,0,.85)', backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,.07)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg,#333A2F,#5a7a4a)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          <div style={{ width: 30, height: 30, borderRadius: 9, background: '#333A2F', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ fontWeight: 900, fontSize: 16, color: '#EBEDDF' }}>D</span>
           </div>
-          <span style={{ fontWeight: 900, fontSize: 19, letterSpacing: '-0.04em' }}>DONLY</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Link to="/login" style={{ color: 'rgba(255,255,255,.5)', fontSize: 14, fontWeight: 500, padding: '8px 14px' }}>
+          <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.03em', color: '#fff' }}>DONLY</span>
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Link to="/login" style={{ padding: '7px 14px', fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,.5)', borderRadius: 8 }}>
             Đăng nhập
           </Link>
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: .97 }}>
-            <Link to="/login" style={{
-              background: '#fff', color: '#0a0a0a', fontWeight: 800, fontSize: 14,
-              padding: '9px 20px', borderRadius: 12,
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-            }}>
-              Bắt đầu <ArrowRight size={14} />
-            </Link>
-          </motion.div>
+          <Link to="/login" style={{ padding: '8px 18px', fontSize: 14, fontWeight: 700, color: '#000', background: '#fff', borderRadius: 9, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            Bắt đầu <ArrowRight size={13} />
+          </Link>
         </div>
       </nav>
 
-      {/* ── HERO ────────────────────────────────────────────────────────── */}
-      <section style={{ position: 'relative', minHeight: '92vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 40px', overflow: 'hidden' }}>
-        {/* Orbs */}
-        <div style={{ position: 'absolute', top: '-5%', left: '5%', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,.11) 0%,transparent 65%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '-10%', right: '0%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle,rgba(236,72,153,.08) 0%,transparent 65%)', pointerEvents: 'none' }} />
-        {/* Subtle grid */}
+      {/* ── HERO ──────────────────────────────────────────────────────────── */}
+      <section style={{ position: 'relative', padding: '120px 32px 100px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', minHeight: '88vh' }}>
+        {/* Ambient glow */}
+        <div style={{ position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)', width: 800, height: 500, borderRadius: '50%', background: `radial-gradient(ellipse,${ACCENT}14 0%,transparent 65%)`, pointerEvents: 'none' }} />
+        {/* Dot grid */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
-          backgroundImage: 'linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px)',
-          backgroundSize: '64px 64px',
-          maskImage: 'radial-gradient(ellipse at center,black 30%,transparent 80%)',
+          backgroundImage: `radial-gradient(rgba(255,255,255,.08) 1px,transparent 1px)`,
+          backgroundSize: '28px 28px',
+          maskImage: 'radial-gradient(ellipse 70% 60% at 50% 50%,black,transparent)',
         }} />
 
-        <div style={{ maxWidth: 1180, width: '100%', display: 'flex', alignItems: 'center', gap: 80, flexWrap: 'wrap', justifyContent: 'center' }}>
-          {/* Left */}
-          <div style={{ flex: '1 1 380px', maxWidth: 560 }}>
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: .7, ease: [.21,.47,.32,.98] }}
-            >
-              {/* Status chip */}
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 99, background: 'rgba(99,102,241,.1)', border: '1px solid rgba(99,102,241,.25)', marginBottom: 32 }}>
-                <motion.div
-                  animate={{ scale: [1, 1.4, 1], opacity: [1, .6, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  style={{ width: 7, height: 7, borderRadius: '50%', background: '#818cf8' }}
-                />
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#a5b4fc' }}>Bio link thế hệ mới cho người Việt</span>
-              </div>
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 72, maxWidth: 1120, width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {/* Text side */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: .7, ease: [.22,.61,.36,1] }}
+            style={{ flex: '1 1 380px', maxWidth: 540 }}
+          >
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 13px', borderRadius: 99, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', marginBottom: 28 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ade80' }} />
+              <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(255,255,255,.6)', letterSpacing: '.01em' }}>Miễn phí · Không cần thẻ ngân hàng</span>
+            </div>
 
-              <h1 style={{ fontSize: 'clamp(44px,5.5vw,76px)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.04, marginBottom: 26 }}>
-                Một link.{' '}
-                <br />
-                <span style={{
-                  background: 'linear-gradient(135deg, #a5b4fc 0%, #818cf8 25%, #f472b6 60%, #fb923c 100%)',
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            <h1 style={{ fontSize: 'clamp(42px,5vw,68px)', fontWeight: 900, letterSpacing: '-0.045em', lineHeight: 1.05, marginBottom: 22, color: '#fff' }}>
+              Một link cho<br />
+              <span style={{ color: 'rgba(255,255,255,.38)' }}>mọi thứ của bạn.</span>
+            </h1>
+
+            <p style={{ fontSize: 17, color: 'rgba(255,255,255,.44)', lineHeight: 1.7, marginBottom: 36, maxWidth: 420 }}>
+              Tạo trang bio cá nhân đẹp và chuyên nghiệp trong vài phút. Links, nhạc, contact form, analytics — tất cả qua một URL duy nhất.
+            </p>
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: .98 }}>
+                <Link to="/login" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  background: '#fff', color: '#000', fontWeight: 800, fontSize: 15,
+                  padding: '13px 26px', borderRadius: 12,
                 }}>
-                  Mọi thứ của bạn.
-                </span>
-              </h1>
-
-              <p style={{ fontSize: 18, color: 'rgba(255,255,255,.48)', lineHeight: 1.75, marginBottom: 38, maxWidth: 460 }}>
-                Tạo trang bio cá nhân đẹp và chuyên nghiệp trong&nbsp;
-                <span style={{ color: 'rgba(255,255,255,.85)', fontWeight: 600 }}>2 phút</span>.
-                Links, nhạc, contact form, analytics — tất cả qua&nbsp;
-                <span style={{ color: 'rgba(255,255,255,.85)', fontWeight: 600 }}>một URL duy nhất</span>.
-              </p>
-
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 48 }}>
-                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: .97 }}>
-                  <Link to="/login" style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 10,
-                    background: '#fff', color: '#0a0a0a', fontWeight: 800, fontSize: 15,
-                    padding: '14px 28px', borderRadius: 14,
-                    boxShadow: '0 4px 24px rgba(255,255,255,.18)',
-                  }}>
-                    Tạo trang miễn phí <ArrowRight size={16} />
-                  </Link>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: .97 }}>
-                  <Link to="/u/demo" target="_blank" style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 8,
-                    background: 'rgba(255,255,255,.06)', color: 'rgba(255,255,255,.7)', fontWeight: 600, fontSize: 15,
-                    padding: '14px 24px', borderRadius: 14, border: '1px solid rgba(255,255,255,.1)',
-                  }}>
-                    Xem demo
-                  </Link>
-                </motion.div>
-              </div>
-
-              {/* Trust */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex' }}>
-                  {['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6'].map((c, i) => (
-                    <div key={i} style={{ width: 30, height: 30, borderRadius: '50%', background: c, border: '2px solid #060608', marginLeft: i > 0 ? -10 : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff', zIndex: 5 - i }}>
-                      {['M', 'T', 'A', 'L', 'D'][i]}
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <div style={{ display: 'flex', gap: 2, marginBottom: 3 }}>
-                    {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="#f59e0b" style={{ color: '#f59e0b' }} />)}
-                  </div>
-                  <span style={{ fontSize: 12, color: 'rgba(255,255,255,.38)', fontWeight: 500 }}>1,000+ creators Việt Nam đang dùng</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Right: phone + floating cards */}
-          <div style={{ position: 'relative', width: 400, height: 580, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {/* Glow */}
-            <motion.div
-              animate={{ opacity: [.5, .8, .5] }}
-              transition={{ duration: 4, repeat: Infinity }}
-              style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,.18) 0%,transparent 70%)', pointerEvents: 'none' }}
-            />
-            {/* Phone */}
-            <motion.div
-              animate={{ y: [0, -12, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-              style={{ zIndex: 2 }}
-            >
-              <PhoneMockup />
-            </motion.div>
-
-            {/* Floating cards */}
-            {[
-              { top: 48, left: -10, delay: 0, duration: 3.8, content: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(16,185,129,.15)', border: '1px solid rgba(16,185,129,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><BarChart2 size={15} color="#10b981" /></div>
-                  <div><p style={{ fontSize: 10, color: 'rgba(255,255,255,.4)', fontWeight: 600, marginBottom: 2 }}>Hôm nay</p><p style={{ fontSize: 14, fontWeight: 800 }}>+128 views</p></div>
-                </div>
-              )},
-              { top: 155, right: -20, delay: .5, duration: 4.2, content: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(236,72,153,.15)', border: '1px solid rgba(236,72,153,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><MessageSquare size={15} color="#ec4899" /></div>
-                  <div><p style={{ fontSize: 10, color: 'rgba(255,255,255,.4)', fontWeight: 600, marginBottom: 2 }}>Tin nhắn mới</p><p style={{ fontSize: 13, fontWeight: 700 }}>Hà My: "Cho mình hỏi..."</p></div>
-                </div>
-              )},
-              { bottom: 195, left: -15, delay: 1, duration: 4.5, content: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(30,215,96,.15)', border: '1px solid rgba(30,215,96,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M0 0L10 6L0 12V0Z" fill="#1ED760" /></svg>
-                  </div>
-                  <div><p style={{ fontSize: 10, color: 'rgba(255,255,255,.4)', fontWeight: 600, marginBottom: 2 }}>Đang phát</p><p style={{ fontSize: 13, fontWeight: 700 }}>Spotify embedded</p></div>
-                </div>
-              )},
-              { bottom: 72, right: -5, delay: .3, duration: 3.5, content: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(245,158,11,.15)', border: '1px solid rgba(245,158,11,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Zap size={15} color="#f59e0b" /></div>
-                  <div><p style={{ fontSize: 10, color: 'rgba(255,255,255,.4)', fontWeight: 600, marginBottom: 2 }}>Link click</p><p style={{ fontSize: 14, fontWeight: 800, color: '#34d399' }}>+42% ↑</p></div>
-                </div>
-              )},
-            ].map((b, i) => (
-              <motion.div
-                key={i}
-                animate={{ y: [0, -7, 0] }}
-                transition={{ duration: b.duration, repeat: Infinity, ease: 'easeInOut', delay: b.delay }}
-                style={{
-                  position: 'absolute', zIndex: 10,
-                  background: 'rgba(12,12,18,.85)', backdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255,255,255,.1)',
-                  borderRadius: 16, padding: '12px 16px',
-                  boxShadow: '0 8px 40px rgba(0,0,0,.5)',
-                  top: 'top' in b ? b.top : undefined,
-                  bottom: 'bottom' in b ? b.bottom : undefined,
-                  left: 'left' in b ? b.left : undefined,
-                  right: 'right' in b ? b.right : undefined,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {b.content}
+                  Tạo trang miễn phí <ArrowRight size={15} />
+                </Link>
               </motion.div>
-            ))}
-          </div>
+              <Link to="/u/demo" target="_blank" style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7,
+                background: 'rgba(255,255,255,.06)', color: 'rgba(255,255,255,.65)', fontWeight: 600, fontSize: 15,
+                padding: '13px 22px', borderRadius: 12, border: '1px solid rgba(255,255,255,.1)',
+              }}>
+                Xem demo
+              </Link>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 36 }}>
+              <div style={{ display: 'flex' }}>
+                {['#5B6AD0', '#a78bfa', '#64748b', '#94a3b8', '#475569'].map((c, i) => (
+                  <div key={i} style={{ width: 28, height: 28, borderRadius: '50%', background: c, border: '2px solid #000', marginLeft: i > 0 ? -9 : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#fff', zIndex: 5 - i }}>
+                    {['M', 'T', 'A', 'L', 'D'][i]}
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div style={{ display: 'flex', gap: 2 }}>
+                  {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="#f59e0b" style={{ color: '#f59e0b' }} />)}
+                </div>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,.32)', marginTop: 2, fontWeight: 500 }}>1,000+ creators đang sử dụng</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Phone side */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: .7, delay: .15, ease: [.22,.61,.36,1] }}
+            style={{ flexShrink: 0 }}
+          >
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <BioPreview />
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ── PLATFORMS MARQUEE ───────────────────────────────────────────── */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,.06)', borderBottom: '1px solid rgba(255,255,255,.06)', padding: '24px 0', overflow: 'hidden', background: 'rgba(255,255,255,.015)' }}>
+      {/* ── PLATFORMS ─────────────────────────────────────────────────────── */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,.06)', borderBottom: '1px solid rgba(255,255,255,.06)', padding: '20px 0', overflow: 'hidden', background: 'rgba(255,255,255,.01)' }}>
         <motion.div
           animate={{ x: ['0%', '-50%'] }}
-          transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
-          style={{ display: 'flex', width: 'max-content', gap: 0 }}
+          transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+          style={{ display: 'flex', width: 'max-content' }}
         >
-          {[...PLATFORMS, ...PLATFORMS].map(([Icon, color], i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 32px', color: 'rgba(255,255,255,.25)', flexShrink: 0 }}>
-              <Icon size={17} color={color as string} style={{ opacity: .55 }} />
-              <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.02em' }}>
-                {['Instagram', 'TikTok', 'YouTube', 'Facebook', 'Spotify', 'GitHub', 'Telegram', 'WhatsApp', 'X (Twitter)', 'Threads'][i % 10]}
-              </span>
-              <span style={{ margin: '0 8px', opacity: .2 }}>·</span>
+          {[...PLATFORMS, ...PLATFORMS].map(([Icon, color, name], i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '0 28px', flexShrink: 0, borderRight: '1px solid rgba(255,255,255,.06)' }}>
+              <Icon size={15} color={color as string} style={{ opacity: .5 }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,.28)', letterSpacing: '.01em' }}>{name}</span>
             </div>
           ))}
         </motion.div>
       </div>
 
-      {/* ── STATS ───────────────────────────────────────────────────────── */}
-      <section style={{ padding: '88px 40px', background: '#060608' }}>
+      {/* ── STATS ─────────────────────────────────────────────────────────── */}
+      <section style={{ padding: '80px 32px', background: '#000' }}>
         <FadeUp>
-          <div style={{ maxWidth: 820, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 2 }}>
+          <div style={{ maxWidth: 860, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}>
             {[
-              { n: '1,000+', sub: 'Creators đang dùng' },
-              { n: '30+', sub: 'Templates đẹp' },
-              { n: '19', sub: 'Layout options' },
-              { n: '< 2 phút', sub: 'Để tạo trang bio' },
+              { n: '1,000+', l: 'Creators đang dùng' },
+              { n: '30+',    l: 'Templates đẹp' },
+              { n: '19',     l: 'Layout options' },
+              { n: '< 2 phút', l: 'Để tạo trang bio' },
             ].map((s, i) => (
-              <div key={i} style={{ textAlign: 'center', padding: '36px 20px', borderRight: i < 3 ? '1px solid rgba(255,255,255,.07)' : 'none' }}>
-                <div style={{ fontSize: 44, fontWeight: 900, letterSpacing: '-0.04em', color: '#fff', lineHeight: 1 }}>{s.n}</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,.35)', fontWeight: 500, marginTop: 8 }}>{s.sub}</div>
+              <div key={i} style={{
+                padding: '32px 24px', textAlign: 'center',
+                borderRight: i < 3 ? '1px solid rgba(255,255,255,.07)' : 'none',
+              }}>
+                <p style={{ fontSize: 40, fontWeight: 900, letterSpacing: '-0.04em', color: '#fff', lineHeight: 1 }}>{s.n}</p>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,.35)', marginTop: 8, fontWeight: 500 }}>{s.l}</p>
               </div>
             ))}
           </div>
         </FadeUp>
       </section>
 
-      {/* ── BENTO FEATURES ──────────────────────────────────────────────── */}
-      <section style={{ padding: '100px 40px', background: '#0a0a10' }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+      {/* ── FEATURES ──────────────────────────────────────────────────────── */}
+      <section style={{ padding: '100px 32px', background: '#0a0a0a', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+        <div style={{ maxWidth: 1040, margin: '0 auto' }}>
           <FadeUp>
-            <div style={{ marginBottom: 56 }}>
-              <Label>Tính năng</Label>
-              <h2 style={{ fontSize: 'clamp(30px,3.5vw,48px)', fontWeight: 900, letterSpacing: '-0.04em', maxWidth: 480 }}>
-                Một công cụ.<br />Vô số khả năng.
-              </h2>
-            </div>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(255,255,255,.28)', textTransform: 'uppercase', marginBottom: 14 }}>Tính năng</p>
+            <h2 style={{ fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 900, letterSpacing: '-0.04em', marginBottom: 16 }}>
+              Một công cụ, vô số khả năng.
+            </h2>
+            <p style={{ fontSize: 16, color: 'rgba(255,255,255,.4)', marginBottom: 60, maxWidth: 460 }}>
+              Mọi tính năng bạn cần để xây dựng trang bio chuyên nghiệp — trong một sản phẩm duy nhất.
+            </p>
           </FadeUp>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, gridAutoRows: 'minmax(170px,auto)' }}>
-            {[
-              { icon: Palette, title: 'Templates & Themes', desc: '30+ template đẹp, 19 layout — từ Minimal đến Magazine. Preview thật trước khi chọn.', accent: '#818cf8', span: 1 },
-              { icon: BarChart2, title: 'Analytics chi tiết', desc: 'Biểu đồ views, clicks, CTR theo ngày. Dashboard rõ ràng, không cần tool thứ 3.', accent: '#34d399', span: 2 },
-              { icon: Music2, title: 'Music Player', desc: 'Nhúng Spotify hoặc YouTube thẳng vào trang bio. Fan nghe nhạc mà không rời trang.', accent: '#1ED760', span: 1 },
-              { icon: MessageSquare, title: 'Contact Form + Inbox', desc: 'Visitor nhắn tin trực tiếp, đọc trong Dashboard — không cần email hay Messenger.', accent: '#f472b6', span: 1 },
-              { icon: Shield, title: 'Bảo vệ trang', desc: 'Đặt mật khẩu riêng cho trang bio. Phù hợp nội dung cần kiểm soát truy cập.', accent: '#fb923c', span: 1, pro: true },
-              { icon: QrCode, title: 'QR Code', desc: 'Tạo QR dẫn về bio page, tải PNG để in danh thiếp, standee hoặc dùng offline.', accent: '#a78bfa', span: 1 },
-              { icon: Globe, title: 'GitHub Stats', desc: 'Block live thống kê GitHub — repos, followers, bio tự cập nhật không cần thao tác.', accent: '#94a3b8', span: 1 },
-              { icon: Layers, title: 'Custom CSS', desc: 'Nhập CSS tuỳ ý để customize không giới hạn. Full control cho designer & developer.', accent: '#60a5fa', span: 1, pro: true },
-              { icon: Link2, title: 'Link nâng cao', desc: 'Schedule bật/tắt link theo lịch, hiệu ứng animation, VCard download 1 chạm.', accent: '#f59e0b', span: 1 },
-            ].map((f, i) => (
-              <FadeUp key={f.title} delay={i * 0.06}>
-                <BentoCard {...f}>
-                  {f.pro && (
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(245,158,11,.12)', border: '1px solid rgba(245,158,11,.25)', borderRadius: 99, padding: '3px 10px', marginTop: 14, alignSelf: 'flex-start' }}>
-                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#f59e0b' }} />
-                      <span style={{ fontSize: 10, fontWeight: 800, color: '#fbbf24', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Pro</span>
-                    </div>
-                  )}
-                </BentoCard>
-              </FadeUp>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ────────────────────────────────────────────────── */}
-      <section style={{ padding: '100px 40px', background: '#060608' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <FadeUp>
-            <div style={{ textAlign: 'center', marginBottom: 64 }}>
-              <Label>Cách hoạt động</Label>
-              <h2 style={{ fontSize: 'clamp(30px,3.5vw,48px)', fontWeight: 900, letterSpacing: '-0.04em' }}>3 bước đơn giản</h2>
-            </div>
-          </FadeUp>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(250px,1fr))', gap: 16 }}>
-            {[
-              { n: '01', icon: Users, title: 'Đăng ký miễn phí', desc: 'Tạo tài khoản trong 10 giây — không cần thẻ ngân hàng, không điều kiện.', accent: '#818cf8' },
-              { n: '02', icon: Palette, title: 'Tùy chỉnh trang bio', desc: 'Chọn template, thêm links, âm nhạc, contact form, testimonials...', accent: '#f472b6', highlight: true },
-              { n: '03', icon: Zap, title: 'Chia sẻ link của bạn', desc: 'Paste URL duy nhất vào Instagram bio, TikTok, danh thiếp, mọi nơi.', accent: '#34d399' },
-            ].map((s, i) => (
-              <FadeUp key={s.n} delay={i * 0.1}>
-                <div style={{
-                  padding: '36px 28px', borderRadius: 22,
-                  background: s.highlight ? `linear-gradient(145deg,${s.accent}18,rgba(255,255,255,.03))` : 'rgba(255,255,255,.03)',
-                  border: `1px solid ${s.highlight ? s.accent + '40' : 'rgba(255,255,255,.08)'}`,
-                  height: '100%',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 12, background: `${s.accent}18`, border: `1px solid ${s.accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <s.icon size={18} color={s.accent} />
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,.2)', letterSpacing: '0.15em' }}>BƯỚC {s.n}</span>
-                  </div>
-                  <p style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.02em' }}>{s.title}</p>
-                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,.42)', lineHeight: 1.7 }}>{s.desc}</p>
-                </div>
-              </FadeUp>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ────────────────────────────────────────────────── */}
-      <section style={{ padding: '100px 40px', background: '#0a0a10' }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-          <FadeUp>
-            <div style={{ textAlign: 'center', marginBottom: 56 }}>
-              <Label>Testimonials</Label>
-              <h2 style={{ fontSize: 'clamp(30px,3.5vw,48px)', fontWeight: 900, letterSpacing: '-0.04em', marginBottom: 14 }}>
-                Được yêu thích bởi creators
-              </h2>
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
-                {[...Array(5)].map((_, i) => <Star key={i} size={15} fill="#f59e0b" style={{ color: '#f59e0b' }} />)}
-                <span style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginLeft: 6, fontWeight: 500 }}>5.0 / 5.0</span>
-              </div>
-            </div>
-          </FadeUp>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 14 }}>
-            {TESTIMONIALS.map((t, i) => (
-              <FadeUp key={t.name} delay={i * 0.07}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1, border: '1px solid rgba(255,255,255,.07)', borderRadius: 16, overflow: 'hidden' }}>
+            {FEATURES.map((f, i) => (
+              <FadeUp key={f.title} delay={i * 0.05}>
                 <motion.div
-                  whileHover={{ borderColor: `${t.color}40`, y: -3 }}
-                  transition={{ duration: .2 }}
-                  style={{ padding: '24px', borderRadius: 18, background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', height: '100%' }}
+                  whileHover={{ background: 'rgba(255,255,255,.04)' }}
+                  style={{
+                    padding: '30px 26px',
+                    background: 'rgba(255,255,255,.02)',
+                    borderRight: (i % 3 !== 2) ? '1px solid rgba(255,255,255,.07)' : 'none',
+                    borderBottom: (i < 6) ? '1px solid rgba(255,255,255,.07)' : 'none',
+                    cursor: 'default',
+                  }}
                 >
-                  <div style={{ display: 'flex', gap: 2, marginBottom: 14 }}>
-                    {[...Array(5)].map((_, j) => <Star key={j} size={12} fill="#f59e0b" style={{ color: '#f59e0b' }} />)}
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18 }}>
+                    <f.icon size={17} style={{ color: 'rgba(255,255,255,.55)' }} />
                   </div>
-                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,.55)', lineHeight: 1.75, marginBottom: 20 }}>"{t.text}"</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 12, flexShrink: 0 }}>
-                      {t.name.split(' ').map(w => w[0]).join('')}
-                    </div>
-                    <div>
-                      <p style={{ fontWeight: 700, fontSize: 13, color: '#fff', lineHeight: 1.2 }}>{t.name}</p>
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,.3)', fontWeight: 500 }}>{t.role}</p>
-                    </div>
-                  </div>
+                  <p style={{ fontWeight: 700, fontSize: 14.5, color: '#fff', marginBottom: 7, letterSpacing: '-0.01em' }}>{f.title}</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,.38)', lineHeight: 1.65 }}>{f.desc}</p>
                 </motion.div>
               </FadeUp>
             ))}
@@ -522,119 +367,214 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── PRICING ─────────────────────────────────────────────────────── */}
-      <section style={{ padding: '100px 40px', background: '#060608' }}>
-        <div style={{ maxWidth: 840, margin: '0 auto' }}>
+      {/* ── HOW IT WORKS ──────────────────────────────────────────────────── */}
+      <section style={{ padding: '100px 32px', background: '#000', borderTop: '1px solid rgba(255,255,255,.07)' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
           <FadeUp>
-            <div style={{ textAlign: 'center', marginBottom: 56 }}>
-              <Label>Pricing</Label>
-              <h2 style={{ fontSize: 'clamp(30px,3.5vw,48px)', fontWeight: 900, letterSpacing: '-0.04em', marginBottom: 12 }}>Đơn giản. Minh bạch.</h2>
-              <p style={{ fontSize: 16, color: 'rgba(255,255,255,.38)' }}>Bắt đầu miễn phí, nâng cấp khi bạn sẵn sàng.</p>
-            </div>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(255,255,255,.28)', textTransform: 'uppercase', marginBottom: 14 }}>Cách hoạt động</p>
+            <h2 style={{ fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 900, letterSpacing: '-0.04em', marginBottom: 60 }}>Bắt đầu trong 3 bước.</h2>
           </FadeUp>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(330px,1fr))', gap: 16 }}>
-            {/* Free */}
-            <FadeUp delay={0.05}>
-              <div style={{ padding: '36px', borderRadius: 24, background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.09)', height: '100%' }}>
-                <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.15em', color: 'rgba(255,255,255,.3)', textTransform: 'uppercase', marginBottom: 10 }}>Free</p>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
-                  <span style={{ fontSize: 52, fontWeight: 900, letterSpacing: '-0.04em', color: '#fff' }}>0</span>
-                  <span style={{ fontSize: 20, color: 'rgba(255,255,255,.5)', fontWeight: 600 }}>₫</span>
-                </div>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,.28)', marginBottom: 28 }}>mãi mãi · không điều kiện</p>
-                <ul style={{ listStyle: 'none', marginBottom: 32, display: 'flex', flexDirection: 'column', gap: 11 }}>
-                  {FREE_F.map(f => (
-                    <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: 'rgba(255,255,255,.6)' }}>
-                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(129,140,248,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Check size={10} style={{ color: '#818cf8' }} />
-                      </div>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link to="/login" style={{
-                  display: 'block', textAlign: 'center', padding: '14px',
-                  borderRadius: 14, border: '1px solid rgba(255,255,255,.12)',
-                  fontWeight: 700, fontSize: 15, color: 'rgba(255,255,255,.7)',
-                  transition: 'all .2s',
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}>
+            {[
+              { n: '01', icon: Users,   title: 'Tạo tài khoản',      desc: 'Đăng ký trong 10 giây. Không cần thẻ ngân hàng.' },
+              { n: '02', icon: Palette, title: 'Tùy chỉnh trang bio', desc: 'Chọn template, thêm links, âm nhạc, contact form và nhiều hơn nữa.', highlight: true },
+              { n: '03', icon: Zap,     title: 'Chia sẻ link',        desc: 'Một URL — dùng trên Instagram, TikTok, danh thiếp, mọi nơi.' },
+            ].map((s, i) => (
+              <FadeUp key={s.n} delay={i * 0.1}>
+                <div style={{
+                  padding: '32px 28px', borderRadius: 16,
+                  background: s.highlight ? 'rgba(91,106,208,.08)' : 'rgba(255,255,255,.03)',
+                  border: `1px solid ${s.highlight ? 'rgba(91,106,208,.25)' : 'rgba(255,255,255,.07)'}`,
                 }}>
-                  Bắt đầu miễn phí
-                </Link>
-              </div>
-            </FadeUp>
-
-            {/* Pro */}
-            <FadeUp delay={0.12}>
-              <div style={{ padding: '36px', borderRadius: 24, background: 'linear-gradient(145deg,rgba(99,102,241,.12),rgba(236,72,153,.08),rgba(6,6,8,1) 70%)', border: '1px solid rgba(99,102,241,.35)', position: 'relative', overflow: 'hidden', height: '100%' }}>
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#6366f1,#ec4899,#f59e0b)' }} />
-                <div style={{ position: 'absolute', top: 28, right: 28, background: 'linear-gradient(135deg,#f59e0b,#f97316)', borderRadius: 99, padding: '3px 10px' }}>
-                  <span style={{ fontSize: 10, fontWeight: 900, color: '#000', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Pro</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 11, background: s.highlight ? 'rgba(91,106,208,.15)' : 'rgba(255,255,255,.05)', border: `1px solid ${s.highlight ? 'rgba(91,106,208,.3)' : 'rgba(255,255,255,.08)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <s.icon size={17} style={{ color: s.highlight ? '#8b92e0' : 'rgba(255,255,255,.45)' }} />
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,.2)', letterSpacing: '.12em' }}>{s.n}</span>
+                  </div>
+                  <p style={{ fontWeight: 700, fontSize: 16, color: '#fff', marginBottom: 8, letterSpacing: '-0.02em' }}>{s.title}</p>
+                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,.42)', lineHeight: 1.65 }}>{s.desc}</p>
                 </div>
-                <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.15em', color: 'rgba(255,255,255,.3)', textTransform: 'uppercase', marginBottom: 10 }}>Pro</p>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
-                  <span style={{ fontSize: 52, fontWeight: 900, letterSpacing: '-0.04em', color: '#fff' }}>149K</span>
-                  <span style={{ fontSize: 20, color: 'rgba(255,255,255,.4)', fontWeight: 600 }}>₫/tháng</span>
-                </div>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,.28)', marginBottom: 28 }}>≈ 5,000₫/ngày · hủy bất kỳ lúc nào</p>
-                <ul style={{ listStyle: 'none', marginBottom: 32, display: 'flex', flexDirection: 'column', gap: 11 }}>
-                  {PRO_F.map(f => (
-                    <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: 'rgba(255,255,255,.7)' }}>
-                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(245,158,11,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Check size={10} style={{ color: '#fbbf24' }} />
-                      </div>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link to="/pricing" style={{
-                  display: 'block', textAlign: 'center', padding: '14px',
-                  borderRadius: 14, background: 'linear-gradient(135deg,#6366f1,#818cf8)',
-                  fontWeight: 800, fontSize: 15, color: '#fff',
-                  boxShadow: '0 8px 32px rgba(99,102,241,.35)', transition: 'all .2s',
-                }}>
-                  Nâng cấp Pro ngay →
-                </Link>
-              </div>
-            </FadeUp>
+              </FadeUp>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA ─────────────────────────────────────────────────────────── */}
-      <section style={{ padding: '0 40px 100px' }}>
+      {/* ── TESTIMONIALS ──────────────────────────────────────────────────── */}
+      <section style={{ padding: '100px 32px', background: '#0a0a0a', borderTop: '1px solid rgba(255,255,255,.07)' }}>
+        <div style={{ maxWidth: 1040, margin: '0 auto' }}>
+          <FadeUp>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(255,255,255,.28)', textTransform: 'uppercase', marginBottom: 14 }}>Đánh giá</p>
+            <h2 style={{ fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 900, letterSpacing: '-0.04em', marginBottom: 56 }}>Creators tin dùng DONLY.</h2>
+          </FadeUp>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+            {TESTIMONIALS.map((t, i) => (
+              <FadeUp key={t.name} delay={i * 0.06}>
+                <div style={{ padding: '24px', borderRadius: 14, background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)', height: '100%' }}>
+                  <div style={{ display: 'flex', gap: 2, marginBottom: 14 }}>
+                    {[...Array(5)].map((_, j) => <Star key={j} size={12} fill="#f59e0b" style={{ color: '#f59e0b' }} />)}
+                  </div>
+                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,.5)', lineHeight: 1.7, marginBottom: 20 }}>"{t.text}"</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 34, height: 34, borderRadius: '50%', background: ACCENT, opacity: .8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
+                      {t.name.split(' ').map((w: string) => w[0]).join('')}
+                    </div>
+                    <div>
+                      <p style={{ fontWeight: 700, fontSize: 13, color: '#fff' }}>{t.name}</p>
+                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,.3)', fontWeight: 500 }}>{t.role}</p>
+                    </div>
+                  </div>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRICING ───────────────────────────────────────────────────────── */}
+      <section style={{ padding: '100px 32px', background: '#000', borderTop: '1px solid rgba(255,255,255,.07)' }}>
+        <div style={{ maxWidth: 980, margin: '0 auto' }}>
+          <FadeUp>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.16em', color: 'rgba(255,255,255,.28)', textTransform: 'uppercase', marginBottom: 14, textAlign: 'center' }}>Pricing</p>
+            <h2 style={{ fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 900, letterSpacing: '-0.04em', textAlign: 'center', marginBottom: 10 }}>Đơn giản và minh bạch.</h2>
+            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,.38)', fontSize: 15, marginBottom: 40 }}>Bắt đầu miễn phí, nâng cấp khi bạn cần thêm.</p>
+
+            {/* Billing toggle */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 56 }}>
+              <div style={{ display: 'inline-flex', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.09)', borderRadius: 12, padding: 4, gap: 2 }}>
+                {(['monthly', 'yearly'] as const).map(b => (
+                  <button key={b} onClick={() => setBilling(b)} style={{
+                    padding: '8px 20px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600,
+                    background: billing === b ? '#fff' : 'transparent',
+                    color: billing === b ? '#000' : 'rgba(255,255,255,.45)',
+                    transition: 'all .2s',
+                    display: 'flex', alignItems: 'center', gap: 7,
+                  }}>
+                    {b === 'monthly' ? 'Theo tháng' : 'Theo năm'}
+                    {b === 'yearly' && (
+                      <span style={{ fontSize: 10, fontWeight: 800, background: billing === 'yearly' ? ACCENT : 'rgba(91,106,208,.25)', color: billing === 'yearly' ? '#fff' : '#8b92e0', padding: '1px 7px', borderRadius: 99, letterSpacing: '.05em' }}>
+                        -33%
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </FadeUp>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, alignItems: 'start' }}>
+            {PLANS.map((plan, i) => (
+              <FadeUp key={plan.name} delay={i * 0.08}>
+                <motion.div
+                  whileHover={{ borderColor: plan.highlight ? `${ACCENT}60` : 'rgba(255,255,255,.14)' }}
+                  style={{
+                    padding: '32px 28px', borderRadius: 18, position: 'relative', overflow: 'hidden',
+                    background: plan.highlight ? 'rgba(91,106,208,.06)' : 'rgba(255,255,255,.02)',
+                    border: `1px solid ${plan.highlight ? 'rgba(91,106,208,.3)' : 'rgba(255,255,255,.08)'}`,
+                    transition: 'border-color .2s',
+                  }}
+                >
+                  {plan.highlight && (
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,transparent,${ACCENT},transparent)` }} />
+                  )}
+                  {plan.badge && (
+                    <div style={{ position: 'absolute', top: 20, right: 20, background: ACCENT, borderRadius: 99, padding: '2px 10px' }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '.06em', textTransform: 'uppercase' }}>{plan.badge}</span>
+                    </div>
+                  )}
+
+                  <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.12em', color: 'rgba(255,255,255,.3)', textTransform: 'uppercase', marginBottom: 10 }}>{plan.name}</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,.38)', marginBottom: 24 }}>{plan.desc}</p>
+
+                  <div style={{ marginBottom: 6 }}>
+                    <motion.div
+                      key={billing + plan.name}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: .25 }}
+                      style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}
+                    >
+                      <span style={{ fontSize: 44, fontWeight: 900, letterSpacing: '-0.04em', color: '#fff' }}>
+                        {billing === 'monthly' ? fmt(plan.monthly) : fmt(plan.yearly ?? plan.monthly)}
+                      </span>
+                      {plan.monthly > 0 && (
+                        <span style={{ fontSize: 14, color: 'rgba(255,255,255,.3)', fontWeight: 500 }}>/tháng</span>
+                      )}
+                    </motion.div>
+                    {billing === 'yearly' && plan.yearlyTotal && (
+                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,.28)', marginTop: 2 }}>
+                        Thanh toán {fmt(plan.yearlyTotal)}/năm
+                      </p>
+                    )}
+                    {plan.monthly === 0 && (
+                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,.28)', marginTop: 2 }}>mãi mãi · không điều kiện</p>
+                    )}
+                  </div>
+
+                  <div style={{ height: 1, background: 'rgba(255,255,255,.07)', margin: '24px 0' }} />
+
+                  <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
+                    {plan.features.map(f => (
+                      <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13.5, color: 'rgba(255,255,255,.6)' }}>
+                        <div style={{ width: 16, height: 16, borderRadius: '50%', background: plan.highlight ? 'rgba(91,106,208,.2)' : 'rgba(255,255,255,.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                          <Check size={9} style={{ color: plan.highlight ? '#8b92e0' : 'rgba(255,255,255,.5)' }} />
+                        </div>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link to={plan.ctaLink} style={{
+                    display: 'block', textAlign: 'center', padding: '12px',
+                    borderRadius: 11, fontSize: 14, fontWeight: 700,
+                    background: plan.highlight ? ACCENT : 'rgba(255,255,255,.07)',
+                    color: plan.highlight ? '#fff' : 'rgba(255,255,255,.75)',
+                    border: plan.highlight ? 'none' : '1px solid rgba(255,255,255,.1)',
+                    transition: 'opacity .2s',
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.opacity = '.85' }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}>
+                    {plan.cta}
+                  </Link>
+                </motion.div>
+              </FadeUp>
+            ))}
+          </div>
+
+          <FadeUp delay={.2}>
+            <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,.22)', marginTop: 28, fontWeight: 500 }}>
+              Tất cả gói đều có 7 ngày dùng thử miễn phí. Hủy bất kỳ lúc nào.
+            </p>
+          </FadeUp>
+        </div>
+      </section>
+
+      {/* ── CTA ───────────────────────────────────────────────────────────── */}
+      <section style={{ padding: '80px 32px 100px', background: '#000', borderTop: '1px solid rgba(255,255,255,.07)' }}>
         <FadeUp>
           <div style={{
-            maxWidth: 960, margin: '0 auto',
-            borderRadius: 28, padding: '88px 40px',
-            textAlign: 'center', position: 'relative', overflow: 'hidden',
-            background: '#0a0a10',
-            border: '1px solid rgba(255,255,255,.08)',
+            maxWidth: 680, margin: '0 auto', textAlign: 'center',
+            padding: '80px 40px', borderRadius: 24,
+            background: 'rgba(255,255,255,.02)', border: '1px solid rgba(255,255,255,.08)',
+            position: 'relative', overflow: 'hidden',
           }}>
-            <div style={{ position: 'absolute', top: '-40%', left: '10%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle,rgba(99,102,241,.1) 0%,transparent 70%)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: '-30%', right: '5%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle,rgba(236,72,153,.08) 0%,transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: '-60%', left: '50%', transform: 'translateX(-50%)', width: 500, height: 400, borderRadius: '50%', background: `radial-gradient(circle,${ACCENT}0d 0%,transparent 70%)`, pointerEvents: 'none' }} />
             <div style={{ position: 'relative', zIndex: 1 }}>
-              <h2 style={{ fontSize: 'clamp(32px,4vw,58px)', fontWeight: 900, letterSpacing: '-0.04em', marginBottom: 16 }}>
-                Bắt đầu ngay hôm nay.
-                <br />
-                <span style={{
-                  background: 'linear-gradient(135deg,#a5b4fc,#f472b6,#fb923c)',
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                }}>Miễn phí mãi mãi.</span>
-              </h2>
-              <p style={{ fontSize: 17, color: 'rgba(255,255,255,.4)', marginBottom: 40, maxWidth: 400, margin: '0 auto 40px' }}>
-                Không cần thẻ ngân hàng. Tạo trang bio trong 2 phút.
+              <h2 style={{ fontSize: 'clamp(28px,3.5vw,44px)', fontWeight: 900, letterSpacing: '-0.04em', marginBottom: 14 }}>Bắt đầu ngay hôm nay.</h2>
+              <p style={{ fontSize: 16, color: 'rgba(255,255,255,.4)', marginBottom: 36, lineHeight: 1.65 }}>
+                Tạo trang bio chuyên nghiệp trong 2 phút. Miễn phí, không cần thẻ ngân hàng.
               </p>
-              <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: .97 }} style={{ display: 'inline-block' }}>
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: .97 }} style={{ display: 'inline-block' }}>
                 <Link to="/login" style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 12,
-                  background: '#fff', color: '#0a0a0a', fontWeight: 900,
-                  padding: '18px 40px', borderRadius: 16, fontSize: 16,
-                  boxShadow: '0 0 0 1px rgba(255,255,255,.15),0 8px 40px rgba(255,255,255,.2)',
+                  display: 'inline-flex', alignItems: 'center', gap: 9,
+                  background: '#fff', color: '#000', fontWeight: 800, fontSize: 15,
+                  padding: '14px 30px', borderRadius: 12,
                 }}>
-                  Tạo trang DONLY của bạn <ArrowRight size={18} />
+                  Tạo trang DONLY của bạn <ArrowRight size={16} />
                 </Link>
               </motion.div>
-              <p style={{ marginTop: 22, fontSize: 13, color: 'rgba(255,255,255,.2)', fontWeight: 500 }}>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,.2)', marginTop: 18 }}>
                 Miễn phí · Không giới hạn links · Không cần credit card
               </p>
             </div>
@@ -642,21 +582,20 @@ export default function Landing() {
         </FadeUp>
       </section>
 
-      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-      <footer style={{ borderTop: '1px solid rgba(255,255,255,.06)', padding: '32px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#333A2F,#5a7a4a)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {/* ── FOOTER ────────────────────────────────────────────────────────── */}
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,.07)', padding: '28px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 26, height: 26, borderRadius: 7, background: '#333A2F', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ fontWeight: 900, fontSize: 13, color: '#EBEDDF' }}>D</span>
           </div>
-          <span style={{ fontWeight: 800, color: 'rgba(255,255,255,.6)', fontSize: 14 }}>DONLY</span>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,.2)' }}>© 2026</span>
+          <span style={{ fontWeight: 700, color: 'rgba(255,255,255,.5)', fontSize: 13 }}>DONLY © 2026</span>
         </div>
-        <div style={{ display: 'flex', gap: 28 }}>
+        <div style={{ display: 'flex', gap: 24 }}>
           {[['Đăng nhập', '/login'], ['Pricing', '/pricing']].map(([l, href]) => (
             <Link key={l} to={href} style={{ fontSize: 13, color: 'rgba(255,255,255,.28)', fontWeight: 500 }}>{l}</Link>
           ))}
         </div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,.18)', fontWeight: 500 }}>Made for creators in Vietnam</p>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,.18)' }}>Made for creators in Vietnam</p>
       </footer>
     </div>
   )
