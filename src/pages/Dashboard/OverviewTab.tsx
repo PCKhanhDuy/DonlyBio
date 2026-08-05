@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Eye, MousePointerClick, Link2, Users, ExternalLink, Plus, PenSquare, QrCode, TrendingUp, Star, Clock } from 'lucide-react'
+import { Eye, MousePointerClick, Link2, Users, ExternalLink, Plus, PenSquare, QrCode, TrendingUp, Star, ArrowRight, Activity } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
@@ -65,189 +65,169 @@ export default function OverviewTab({ onTabChange }: { onTabChange: (t: string) 
   }
 
   if (loading) return (
-    <div className="flex justify-center py-20">
-      <div className="w-7 h-7 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#333A2F', borderTopColor: 'transparent' }} />
+    <div className="flex justify-center py-24">
+      <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#333A2F', borderTopColor: 'transparent' }} />
     </div>
   )
 
   const s = stats!
+
   const statCards = [
-    { label: 'Lượt xem (7 ngày)', value: s.views7d, icon: Eye,              color: '#333A2F', bg: '#EBEDDF' },
-    { label: 'Lượt click (7 ngày)', value: s.clicks7d, icon: MousePointerClick, color: '#2563eb', bg: '#dbeafe' },
-    { label: 'Links đang bật',     value: s.activeLinks, icon: Link2,         color: '#7c3aed', bg: '#ede9fe' },
-    { label: 'Subscribers',        value: s.subscribers, icon: Users,          color: '#059669', bg: '#d1fae5' },
+    { label: 'Lượt xem', sub: '7 ngày qua',    value: s.views7d,    icon: Eye,               accent: '#333A2F', bg: '#F5F5F0' },
+    { label: 'Lượt click', sub: '7 ngày qua',   value: s.clicks7d,   icon: MousePointerClick, accent: '#2563eb', bg: '#EFF6FF' },
+    { label: 'Links bật',  sub: `/${s.totalLinks} tổng`, value: s.activeLinks, icon: Link2,    accent: '#7c3aed', bg: '#F5F3FF' },
+    { label: 'Subscribers', sub: 'email',        value: s.subscribers, icon: Users,             accent: '#059669', bg: '#ECFDF5' },
   ]
 
-  const hasData = s.views7d > 0 || s.clicks7d > 0 || s.totalLinks > 0
+  const checklist = [
+    { done: !!profile?.avatar_url,  label: 'Upload ảnh đại diện', action: () => onTabChange('settings') },
+    { done: !!profile?.bio,          label: 'Viết bio',             action: () => onTabChange('settings') },
+    { done: s.totalLinks > 0,        label: 'Thêm link đầu tiên',  action: () => onTabChange('links')    },
+    { done: s.subscribers > 0,       label: 'Thu subscriber đầu tiên', action: () => onTabChange('extras') },
+  ]
+  const allDone = checklist.every(c => c.done)
 
   return (
-    <div className="space-y-6">
-      {/* Welcome */}
-      <div className="flex items-start justify-between gap-4">
+    <div className="space-y-5 max-w-4xl">
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">
-            Xin chào, {profile?.display_name || profile?.username}! 👋
+          <h2 className="text-lg font-bold text-gray-900">
+            Xin chào, {profile?.display_name || profile?.username}
           </h2>
-          <p className="text-sm text-gray-500 mt-0.5">Đây là tổng quan trang DONLY của bạn.</p>
+          <p className="text-sm text-gray-400 mt-0.5">Tổng quan trang DONLY của bạn</p>
         </div>
         <a href={publicUrl} target="_blank" rel="noreferrer"
-          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all">
-          <ExternalLink size={14} /> Xem trang
+          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all">
+          <ExternalLink size={13} /> Xem trang
         </a>
       </div>
 
-      {/* Stats grid */}
+      {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {statCards.map(c => (
-          <div key={c.label} className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: c.bg }}>
-              <c.icon size={17} style={{ color: c.color }} />
+          <div key={c.label} className="bg-white rounded-2xl border border-gray-100 p-4 hover:border-gray-200 hover:shadow-sm transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: c.bg }}>
+                <c.icon size={15} style={{ color: c.accent }} />
+              </div>
+              <Activity size={11} className="text-gray-200" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{c.value.toLocaleString()}</p>
-            <p className="text-xs text-gray-500 mt-0.5 leading-tight">{c.label}</p>
+            <p className="text-2xl font-black text-gray-900 tabular-nums">{c.value.toLocaleString()}</p>
+            <p className="text-xs font-semibold text-gray-600 mt-0.5">{c.label}</p>
+            <p className="text-[10px] text-gray-400">{c.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Quick actions */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Quick Actions</p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      <div className="bg-white rounded-2xl border border-gray-100 p-5">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-4">Thao tác nhanh</p>
+        <div className="grid grid-cols-4 gap-2">
           {[
-            { label: 'Thêm Link',     icon: Plus,       action: () => onTabChange('links'),      color: '#333A2F', bg: '#EBEDDF' },
-            { label: 'Mở Editor',     icon: PenSquare,  action: () => {},                         color: '#7c3aed', bg: '#ede9fe', href: '/editor' },
-            { label: 'Analytics',     icon: TrendingUp, action: () => onTabChange('analytics'),  color: '#2563eb', bg: '#dbeafe' },
-            { label: 'QR Code',       icon: QrCode,     action: () => setShowQr(true),          color: '#059669', bg: '#d1fae5' },
+            { label: 'Thêm Link', icon: Plus,      accent: '#333A2F', bg: '#F5F5F0', onClick: () => onTabChange('links'), href: null },
+            { label: 'Editor',    icon: PenSquare,  accent: '#7c3aed', bg: '#F5F3FF', onClick: () => {},                   href: '/editor' },
+            { label: 'Analytics', icon: TrendingUp, accent: '#2563eb', bg: '#EFF6FF', onClick: () => onTabChange('analytics'), href: null },
+            { label: 'QR Code',   icon: QrCode,     accent: '#059669', bg: '#ECFDF5', onClick: () => setShowQr(true),      href: null },
           ].map(a => {
-            const inner = (
-              <button key={a.label} onClick={a.action}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all text-center w-full">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: a.bg }}>
-                  <a.icon size={18} style={{ color: a.color }} />
+            const content = (
+              <div className="flex flex-col items-center gap-2.5 p-3.5 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all text-center cursor-pointer w-full">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: a.bg }}>
+                  <a.icon size={16} style={{ color: a.accent }} />
                 </div>
-                <span className="text-xs font-semibold text-gray-700">{a.label}</span>
-              </button>
+                <span className="text-xs font-semibold text-gray-700 leading-tight">{a.label}</span>
+              </div>
             )
-            return a.href
-              ? <Link key={a.label} to={a.href}>{inner}</Link>
-              : <div key={a.label}>{inner}</div>
+            if (a.href) return <Link key={a.label} to={a.href}>{content}</Link>
+            return <button key={a.label} onClick={a.onClick} className="text-left">{content}</button>
           })}
         </div>
       </div>
 
-      {/* Two column: Top links + Featured */}
+      {/* Two column */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Top performing links */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp size={15} className="text-gray-400" />
-            <p className="text-sm font-semibold text-gray-800">Top Links (7 ngày)</p>
+
+        {/* Top links */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp size={14} className="text-gray-400" />
+              <p className="text-sm font-bold text-gray-800">Top Links</p>
+              <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full font-medium">7 ngày</span>
+            </div>
           </div>
           {s.topLinks.length === 0 ? (
-            <div className="text-center py-6">
-              <MousePointerClick size={24} className="mx-auto text-gray-200 mb-2" />
-              <p className="text-xs text-gray-400">Chưa có click nào. Chia sẻ trang để bắt đầu!</p>
+            <div className="flex flex-col items-center justify-center py-8 gap-2">
+              <MousePointerClick size={28} className="text-gray-200" />
+              <p className="text-xs text-gray-400 text-center">Chưa có click nào.<br />Chia sẻ trang để bắt đầu!</p>
             </div>
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {s.topLinks.map((item, i) => (
-                <div key={item.link.id} className="flex items-center gap-3">
-                  <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
-                    style={{ background: i === 0 ? '#EBEDDF' : '#f3f4f6', color: i === 0 ? '#333A2F' : '#9ca3af' }}>
+                <div key={item.link.id} className="flex items-center gap-3 py-1.5">
+                  <span className="w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0"
+                    style={i === 0 ? { background: '#333A2F', color: '#fff' } : { background: '#f3f4f6', color: '#9ca3af' }}>
                     {i + 1}
                   </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-gray-700 truncate">{item.link.title}</p>
-                  </div>
-                  <span className="text-xs font-bold flex-shrink-0" style={{ color: '#333A2F' }}>
-                    {item.clicks} click
+                  <p className="flex-1 text-xs font-semibold text-gray-700 truncate">{item.link.title}</p>
+                  <span className="text-xs font-black flex-shrink-0 tabular-nums" style={{ color: '#333A2F' }}>
+                    {item.clicks}
                   </span>
                 </div>
               ))}
             </div>
           )}
           <button onClick={() => onTabChange('analytics')}
-            className="mt-4 text-xs font-medium w-full text-center py-2 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors" style={{ color: '#333A2F' }}>
-            Xem đầy đủ →
+            className="mt-4 flex items-center justify-center gap-1.5 w-full text-xs font-semibold py-2.5 rounded-xl border border-gray-100 hover:bg-gray-50 hover:border-gray-200 transition-all text-gray-500">
+            Xem Analytics <ArrowRight size={11} />
           </button>
         </div>
 
-        {/* Getting started / Featured link */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+        {/* Checklist / Featured */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-5">
           {s.featuredLink ? (
             <>
               <div className="flex items-center gap-2 mb-4">
-                <Star size={15} className="text-amber-500" />
-                <p className="text-sm font-semibold text-gray-800">Link Nổi Bật</p>
+                <Star size={14} style={{ color: '#f59e0b' }} fill="#f59e0b" />
+                <p className="text-sm font-bold text-gray-800">Link Nổi Bật</p>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#EBEDDF' }}>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#333A2F' }}>
-                  <Star size={15} className="text-white" fill="white" />
+              <div className="flex items-center gap-3 p-3.5 rounded-xl" style={{ background: '#F5F5F0' }}>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#333A2F' }}>
+                  <Star size={14} className="text-white" fill="white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold" style={{ color: '#333A2F' }}>{s.featuredLink.title}</p>
-                  <p className="text-xs text-gray-500 truncate">{s.featuredLink.url}</p>
+                  <p className="text-sm font-bold truncate" style={{ color: '#333A2F' }}>{s.featuredLink.title}</p>
+                  <p className="text-xs text-gray-400 truncate mt-0.5">{s.featuredLink.url}</p>
                 </div>
               </div>
-              <p className="text-xs text-gray-400 mt-3 text-center">Link này hiển thị nổi bật trên trang của bạn.</p>
+              <p className="text-xs text-gray-400 mt-3 text-center">Hiển thị nổi bật trên trang của bạn</p>
             </>
-          ) : !hasData ? (
+          ) : (
             <>
-              <div className="flex items-center gap-2 mb-4">
-                <Clock size={15} className="text-gray-400" />
-                <p className="text-sm font-semibold text-gray-800">Bắt đầu</p>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm font-bold text-gray-800">Bắt đầu</p>
+                {allDone && <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Hoàn thành</span>}
               </div>
-              <div className="space-y-2.5">
-                {[
-                  { done: !!profile?.avatar_url,  label: 'Upload ảnh đại diện',        action: () => onTabChange('settings') },
-                  { done: !!profile?.bio,          label: 'Viết bio',                   action: () => onTabChange('settings') },
-                  { done: s.totalLinks > 0,        label: 'Thêm link đầu tiên',        action: () => onTabChange('links') },
-                  { done: s.subscribers > 0,       label: 'Thu được subscriber đầu tiên', action: () => onTabChange('extras') },
-                ].map(item => (
+              <div className="space-y-1.5">
+                {checklist.map(item => (
                   <button key={item.label} onClick={item.action}
-                    className={`flex items-center gap-3 w-full text-left p-2.5 rounded-xl text-xs transition-all ${item.done ? 'opacity-60' : 'hover:bg-gray-50'}`}>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${item.done ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
-                      {item.done && <span className="text-white text-[9px] font-bold">✓</span>}
+                    className={`flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-xl text-xs transition-all ${item.done ? 'opacity-50 cursor-default' : 'hover:bg-gray-50'}`}>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${item.done ? 'border-green-500 bg-green-500' : 'border-gray-300'}`}>
+                      {item.done && (
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                          <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
                     </div>
                     <span className={`font-medium ${item.done ? 'line-through text-gray-400' : 'text-gray-700'}`}>{item.label}</span>
+                    {!item.done && <ArrowRight size={11} className="ml-auto text-gray-300 flex-shrink-0" />}
                   </button>
                 ))}
               </div>
             </>
-          ) : (
-            <>
-              <div className="flex items-center gap-2 mb-4">
-                <Star size={15} className="text-gray-400" />
-                <p className="text-sm font-semibold text-gray-800">Link Nổi Bật</p>
-              </div>
-              <div className="text-center py-6">
-                <Star size={24} className="mx-auto text-gray-200 mb-2" />
-                <p className="text-xs text-gray-400">Chưa có link nổi bật nào.</p>
-                <button onClick={() => onTabChange('links')}
-                  className="mt-3 text-xs font-medium px-4 py-1.5 rounded-xl text-white transition-all"
-                  style={{ background: '#333A2F' }}>
-                  Chọn Link Nổi Bật
-                </button>
-              </div>
-            </>
           )}
         </div>
-      </div>
-
-      {/* Public URL card */}
-      <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: '#EBEDDF' }}>
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#333A2F' }}>
-          <ExternalLink size={17} className="text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: '#333A2F' }}>Your DONLY Link</p>
-          <p className="text-sm font-semibold truncate" style={{ color: '#333A2F' }}>{publicUrl}</p>
-        </div>
-        <a href={publicUrl} target="_blank" rel="noreferrer"
-          className="flex-shrink-0 px-4 py-2 text-sm font-semibold text-white rounded-xl hover:opacity-90 transition-all"
-          style={{ background: '#333A2F' }}>
-          Xem →
-        </a>
       </div>
 
       {showQr && (

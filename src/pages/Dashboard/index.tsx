@@ -31,20 +31,20 @@ function StatsBar({ userId }: { userId: string }) {
   if (!stats) return null
 
   const items = [
-    { label: 'Links',    value: stats.links,    color: 'bg-[#EBEDDF] text-[#333A2F]' },
-    { label: 'Products', value: stats.products, color: 'bg-blue-100 text-blue-700'   },
-    { label: 'Albums',   value: stats.albums,   color: 'bg-pink-100 text-pink-700'   },
+    { label: 'Links',    value: stats.links    },
+    { label: 'Products', value: stats.products  },
+    { label: 'Albums',   value: stats.albums    },
   ]
 
   return (
-    <div className="flex items-center gap-3 px-8 py-3 bg-white border-b border-gray-100 overflow-x-auto">
-      {items.map(s => (
-        <div key={s.label} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${s.color}`}>
-          <span className="text-base font-bold">{s.value}</span>
-          <span className="opacity-75">{s.label}</span>
+    <div className="flex items-center gap-5 px-8 py-2.5 bg-white border-b border-gray-100 overflow-x-auto">
+      {items.map((s, i) => (
+        <div key={s.label} className="flex items-center gap-1.5">
+          {i > 0 && <span className="text-gray-200 mr-3">·</span>}
+          <span className="text-sm font-bold text-gray-800">{s.value}</span>
+          <span className="text-xs text-gray-400">{s.label}</span>
         </div>
       ))}
-      <p className="text-xs text-gray-400 ml-auto hidden sm:block">Your DONLY BioLink overview</p>
     </div>
   )
 }
@@ -108,35 +108,32 @@ function Sidebar({ profile, tab, setTab, copied, copyLink, publicUrl, handleSign
         ))}
       </nav>
 
-      {/* Upgrade CTA (free users) */}
+      {/* PRO */}
       {!isPro && (
         <div className="px-3 py-3 border-t border-gray-100">
           <Link to="/pricing"
-            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-all"
-            style={{ background: 'linear-gradient(135deg,#f59e0b,#f97316)', color: '#fff' }}>
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all border"
+            style={{ background: '#FEFCE8', borderColor: '#FDE68A', color: '#92400E' }}>
             <Crown size={14} /> Nâng cấp PRO
           </Link>
         </div>
       )}
       {isPro && (
         <div className="px-3 py-3 border-t border-gray-100">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-50">
-            <Crown size={13} className="text-amber-500 flex-shrink-0" />
-            <span className="text-xs font-bold text-amber-600">PRO đang hoạt động</span>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl border" style={{ background: '#FEFCE8', borderColor: '#FDE68A' }}>
+            <Crown size={13} style={{ color: '#D97706' }} />
+            <span className="text-xs font-bold" style={{ color: '#92400E' }}>PRO đang hoạt động</span>
           </div>
         </div>
       )}
 
       {/* Open Editor */}
-      <div className="px-3 py-3 border-t border-gray-100 space-y-1.5">
+      <div className="px-3 py-3 border-t border-gray-100">
         <Link to="/editor"
-          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-white hover:opacity-90 transition-all shadow-sm"
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-white hover:opacity-90 transition-all"
           style={{ background: '#333A2F' }}>
           <PenSquare size={15} /> Open Editor
         </Link>
-        <p className="text-[10px] text-gray-400 text-center leading-tight px-1">
-          Recommended on desktop or wide screens for best experience
-        </p>
       </div>
 
       {/* Sign out */}
@@ -172,46 +169,108 @@ function PhonePreview({ url }: { url: string }) {
   const [key, setKey] = useState(0)
   const refresh = useCallback(() => setKey(k => k + 1), [])
 
+  // iPhone 15 proportions: ~390×844 logical px → aspect ~1:2.16
+  const W = 220
+  const H = Math.round(W * 2.16)
+  const FRAME = 12        // bezel thickness
+  const INNER_W = W - FRAME * 2
+  const INNER_H = H - FRAME * 2
+  const SCALE = INNER_W / 390  // scale content from 390px wide
+
   return (
-    <div className="flex flex-col items-center gap-3 pt-4 pb-6">
-      <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
-        <Smartphone size={13} />
+    <div className="flex flex-col items-center gap-3 pt-6 pb-6 select-none">
+      {/* Label */}
+      <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-400 tracking-wide">
+        <Smartphone size={12} />
         <span>Live Preview</span>
-        <button onClick={refresh} className="ml-1 p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-all" title="Refresh preview">
-          <RefreshCw size={12} />
+        <button onClick={refresh} className="p-1 rounded-md hover:bg-gray-100 text-gray-300 hover:text-gray-600 transition-all ml-0.5">
+          <RefreshCw size={11} />
         </button>
       </div>
 
-      {/* Phone shell */}
-      <div className="relative" style={{ width: 256 }}>
-        {/* Outer shell */}
-        <div className="absolute inset-0 rounded-[2.5rem] bg-gray-900 shadow-2xl" style={{ margin: '-10px' }} />
-        {/* Screen bezel */}
-        <div className="relative rounded-[2rem] overflow-hidden bg-white" style={{ height: 520 }}>
-          {/* Notch */}
-          <div className="absolute top-0 inset-x-0 z-10 flex justify-center pt-2">
-            <div className="w-20 h-5 bg-gray-900 rounded-b-xl flex items-center justify-center gap-1.5">
-              <div className="w-1.5 h-1.5 bg-gray-700 rounded-full" />
-              <div className="w-3 h-1.5 bg-gray-700 rounded-full" />
+      {/* iPhone shell */}
+      <div
+        className="relative flex-shrink-0"
+        style={{
+          width: W,
+          height: H,
+          borderRadius: 44,
+          background: 'linear-gradient(145deg, #2a2a2c 0%, #1a1a1c 50%, #141416 100%)',
+          boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 32px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.12)',
+          padding: FRAME,
+        }}
+      >
+        {/* Side buttons (left) */}
+        <div className="absolute" style={{ left: -3, top: 80, width: 3, height: 34, background: '#2a2a2c', borderRadius: '2px 0 0 2px', boxShadow: '-1px 0 0 rgba(255,255,255,0.06)' }} />
+        <div className="absolute" style={{ left: -3, top: 124, width: 3, height: 56, background: '#2a2a2c', borderRadius: '2px 0 0 2px', boxShadow: '-1px 0 0 rgba(255,255,255,0.06)' }} />
+        <div className="absolute" style={{ left: -3, top: 192, width: 3, height: 56, background: '#2a2a2c', borderRadius: '2px 0 0 2px', boxShadow: '-1px 0 0 rgba(255,255,255,0.06)' }} />
+        {/* Power button (right) */}
+        <div className="absolute" style={{ right: -3, top: 140, width: 3, height: 72, background: '#2a2a2c', borderRadius: '0 2px 2px 0', boxShadow: '1px 0 0 rgba(255,255,255,0.06)' }} />
+
+        {/* Screen */}
+        <div
+          className="relative overflow-hidden bg-white"
+          style={{
+            width: INNER_W,
+            height: INNER_H,
+            borderRadius: 34,
+          }}
+        >
+          {/* Dynamic Island */}
+          <div
+            className="absolute z-20 flex items-center justify-center gap-1.5"
+            style={{
+              top: 12,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 90,
+              height: 30,
+              background: '#000',
+              borderRadius: 20,
+            }}
+          >
+            <div className="w-2 h-2 rounded-full bg-gray-800" />
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-800" />
+          </div>
+
+          {/* Status bar */}
+          <div className="absolute z-10 top-0 inset-x-0 flex items-center justify-between px-5 pt-2" style={{ height: 48 }}>
+            <span className="text-[10px] font-bold text-black/70">9:41</span>
+            <div className="flex items-center gap-1 opacity-70">
+              {/* signal bars */}
+              <svg width="16" height="11" viewBox="0 0 16 11"><rect x="0" y="6" width="3" height="5" rx="0.5" fill="#000"/><rect x="4.5" y="4" width="3" height="7" rx="0.5" fill="#000"/><rect x="9" y="2" width="3" height="9" rx="0.5" fill="#000"/><rect x="13.5" y="0" width="2.5" height="11" rx="0.5" fill="#000"/></svg>
+              {/* wifi */}
+              <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm0-3.5C8.6 5 10 5.8 11 7l-1.2 1.2A3.5 3.5 0 0 0 7 7c-.96 0-1.83.39-2.46 1.02L3.3 6.8C4.3 5.7 5.6 5 7 5zm0-3.5c2.4 0 4.55 1.1 6 2.83L11.8 5.03A6.5 6.5 0 0 0 7 3a6.5 6.5 0 0 0-4.8 2.1L1 3.86A9.5 9.5 0 0 1 7 1.5z" fill="#000"/></svg>
+              {/* battery */}
+              <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0.5" y="0.5" width="18" height="10" rx="2.5" stroke="#000" strokeOpacity="0.35" fill="none"/><rect x="19.5" y="3.5" width="2" height="4" rx="1" fill="#000" fillOpacity="0.4"/><rect x="2" y="2" width="13" height="7" rx="1.5" fill="#000"/></svg>
             </div>
           </div>
+
           {/* iframe */}
-          <iframe
-            key={key}
-            src={url}
-            className="w-full h-full border-0"
-            title="Page preview"
-            style={{ transform: 'scale(0.75)', transformOrigin: 'top left', width: '133.33%', height: '133.33%' }}
-          />
-        </div>
-        {/* Home indicator */}
-        <div className="flex justify-center mt-2">
-          <div className="w-20 h-1 bg-gray-300 rounded-full" />
+          <div className="absolute inset-0" style={{ top: 0 }}>
+            <iframe
+              key={key}
+              src={url}
+              title="Page preview"
+              className="border-0"
+              style={{
+                width: Math.round(INNER_W / SCALE),
+                height: Math.round(INNER_H / SCALE),
+                transform: `scale(${SCALE})`,
+                transformOrigin: 'top left',
+              }}
+            />
+          </div>
+
+          {/* Home indicator */}
+          <div className="absolute bottom-2 inset-x-0 flex justify-center z-20">
+            <div className="w-24 h-1 rounded-full bg-black/20" />
+          </div>
         </div>
       </div>
 
       <a href={url} target="_blank" rel="noreferrer"
-        className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors">
+        className="flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-gray-700 transition-colors font-medium">
         <ExternalLink size={11} /> Open in new tab
       </a>
     </div>
