@@ -185,17 +185,19 @@ export default function AppearanceTab() {
       </div>
 
       {/* Section tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
-        {SECTIONS.map(s => (
-          <button key={s.id} onClick={() => setSection(s.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              section === s.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-            }`}>
-            <s.icon size={14} />
-            <span className="hidden sm:inline">{s.label}</span>
-            <span className="sm:hidden">{s.label.split(' ')[0]}</span>
-          </button>
-        ))}
+      <div className="overflow-x-auto pb-0.5 -mb-0.5">
+        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-max min-w-full sm:w-fit">
+          {SECTIONS.map(s => (
+            <button key={s.id} onClick={() => setSection(s.id)}
+              className={`flex-shrink-0 flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                section === s.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              }`}>
+              <s.icon size={14} />
+              <span className="hidden sm:inline">{s.label}</span>
+              <span className="sm:hidden text-xs">{s.label.split(' ')[0]}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ── TEMPLATES ─── */}
@@ -870,7 +872,7 @@ export default function AppearanceTab() {
             </div>
           ) : (
             <div className="text-center py-10 text-gray-400 text-sm bg-white rounded-2xl border border-dashed border-gray-200">
-              No social icons added yet.
+              Chưa có icon mạng xã hội nào.
             </div>
           )}
 

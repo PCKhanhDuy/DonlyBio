@@ -129,36 +129,36 @@ export default function GalleryTab() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Photo Albums</h2>
-          <p className="text-sm text-gray-500 mt-0.5">Organize shoots by concept — visitors swipe through like stories.</p>
+          <h2 className="text-xl font-bold text-gray-900">Album ảnh</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Nhóm ảnh theo chủ đề — khách xem như stories.</p>
         </div>
         <button
           onClick={() => setShowCreate(!showCreate)}
           className="flex items-center gap-2 px-4 py-2.5 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-all"
           style={{ background: '#333A2F' }}>
-          <Plus size={16} /> New Album
+          <Plus size={16} /> Tạo album
         </button>
       </div>
 
       {showCreate && (
         <form onSubmit={createAlbum}
           className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm space-y-3">
-          <p className="font-semibold text-gray-800 text-sm">Create Album</p>
+          <p className="font-semibold text-gray-800 text-sm">Tạo album mới</p>
           <input
-            type="text" placeholder="Album name  (e.g. Street Style 2024) *"
+            type="text" placeholder="Tên album (vd: Street Style 2024) *"
             value={newName} required onChange={e => setNewName(e.target.value)}
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#333A2F]" />
           <input
-            type="text" placeholder="Short description (optional)"
+            type="text" placeholder="Mô tả ngắn (tuỳ chọn)"
             value={newDesc} onChange={e => setNewDesc(e.target.value)}
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#333A2F]" />
           <div className="flex gap-2 justify-end">
             <button type="button" onClick={() => { setShowCreate(false); setNewName(''); setNewDesc('') }}
-              className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-xl">Cancel</button>
+              className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-xl">Hủy</button>
             <button type="submit" disabled={creating}
               className="px-4 py-2 text-white text-sm font-medium rounded-xl disabled:opacity-50"
               style={{ background: '#333A2F' }}>
-              {creating ? 'Creating…' : 'Create Album'}
+              {creating ? 'Đang tạo…' : 'Tạo album'}
             </button>
           </div>
         </form>
@@ -171,9 +171,9 @@ export default function GalleryTab() {
       ) : albums.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
           <Camera size={34} className="mx-auto text-gray-300 mb-3" />
-          <p className="text-sm font-semibold text-gray-500">No albums yet</p>
+          <p className="text-sm font-semibold text-gray-500">Chưa có album nào</p>
           <p className="text-xs text-gray-400 mt-1.5 max-w-xs mx-auto">
-            Create albums for each photoshoot concept. Visitors can swipe through them like Instagram stories.
+            Tạo album cho từng buổi chụp. Khách có thể vuốt xem như Instagram Stories.
           </p>
         </div>
       ) : (
@@ -188,7 +188,7 @@ export default function GalleryTab() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   : <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-gray-100 to-gray-200">
                       <ImageIcon size={30} className="text-gray-400" />
-                      <p className="text-xs text-gray-400">No cover</p>
+                      <p className="text-xs text-gray-400">Chưa có ảnh</p>
                     </div>
                 }
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent" />
@@ -237,13 +237,13 @@ export default function GalleryTab() {
         </button>
         <div className="flex-1 min-w-0">
           <h2 className="text-lg font-bold text-gray-900 truncate">{activeAlbum!.name}</h2>
-          <p className="text-sm text-gray-400">{photos.length} photo{photos.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-gray-400">{photos.length} ảnh</p>
         </div>
         <label
           className={`flex items-center gap-2 px-4 py-2.5 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-all cursor-pointer ${uploading ? 'opacity-60 cursor-wait' : ''}`}
           style={{ background: '#333A2F' }}>
           <input type="file" accept="image/*" multiple onChange={uploadPhotos} className="hidden" disabled={uploading} />
-          <Upload size={15} /> {uploading ? 'Uploading…' : 'Add Photos'}
+          <Upload size={15} /> {uploading ? 'Đang tải lên…' : 'Thêm ảnh'}
         </label>
       </div>
 
@@ -252,8 +252,8 @@ export default function GalleryTab() {
           <input type="file" accept="image/*" multiple onChange={uploadPhotos} className="hidden" disabled={uploading} />
           <Upload size={36} className="text-gray-300" />
           <div className="text-center">
-            <p className="text-sm font-semibold text-gray-500">Upload your first photos</p>
-            <p className="text-xs text-gray-400 mt-1">Select multiple photos at once — they'll appear as a story.</p>
+            <p className="text-sm font-semibold text-gray-500">Tải ảnh đầu tiên lên</p>
+            <p className="text-xs text-gray-400 mt-1">Chọn nhiều ảnh cùng lúc — hiển thị như story.</p>
           </div>
         </label>
       ) : (
@@ -262,7 +262,7 @@ export default function GalleryTab() {
           <button onClick={() => setStoryIdx(0)}
             className="w-full flex items-center justify-center gap-2.5 py-3 border text-sm font-semibold rounded-2xl hover:opacity-90 transition-colors"
             style={{ borderColor: '#333A2F', background: '#EBEDDF', color: '#333A2F' }}>
-            <span className="text-base">▶</span> Preview as Story ({photos.length} slides)
+            <span className="text-base">▶</span> Xem trước Story ({photos.length} ảnh)
           </button>
 
           {/* Photos masonry */}

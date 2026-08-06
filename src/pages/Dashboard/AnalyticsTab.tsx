@@ -87,7 +87,8 @@ export default function AnalyticsTab() {
     setLoading(false)
   }
 
-  const maxViews = Math.max(...views.map(v => v.count), 1)
+  const maxViews  = Math.max(...views.map(v => v.count), 1)
+  const maxClicks = Math.max(...clicksByDay.map(v => v.count), 1)
 
   const formatDate = (d: string) => {
     const dt = new Date(d + 'T00:00:00')
@@ -177,39 +178,42 @@ export default function AnalyticsTab() {
           <h3 className="font-semibold text-gray-800 text-sm">Lượt xem theo ngày</h3>
         </div>
         {loading ? (
-          <div className="h-32 flex items-center justify-center">
+          <div className="h-[100px] flex items-center justify-center">
             <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#333A2F', borderTopColor: 'transparent' }} />
           </div>
         ) : (
-          <div className="flex items-end gap-1 h-32">
-            {views.map(v => (
-              <div key={v.date} className="flex-1 flex flex-col items-center gap-1 group">
-                <div className="w-full relative flex flex-col justify-end" style={{ height: '100px' }}>
-                  <div
-                    className="w-full rounded-t-sm transition-all duration-300 group-hover:opacity-80 relative"
-                    style={{
-                      height: `${Math.max(4, (v.count / maxViews) * 100)}%`,
-                      background: '#333A2F',
-                    }}>
-                    {v.count > 0 && (
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity pointer-events-none">
-                        {v.count}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {range <= 7 && (
-                  <span className="text-[9px] text-gray-400">{formatDate(v.date)}</span>
-                )}
+          <>
+            <div className="relative" style={{ height: '100px' }}>
+              <div className="absolute inset-0 pointer-events-none">
+                {[75, 50, 25].map(pct => (
+                  <div key={pct} className="absolute left-0 right-0 border-t border-gray-100"
+                    style={{ bottom: `${pct}%` }} />
+                ))}
               </div>
-            ))}
-          </div>
-        )}
-        {range === 30 && (
-          <div className="flex justify-between mt-1">
-            <span className="text-[10px] text-gray-400">{formatDate(views[0]?.date ?? '')}</span>
-            <span className="text-[10px] text-gray-400">{formatDate(views[views.length - 1]?.date ?? '')}</span>
-          </div>
+              <div className="absolute inset-0 flex items-end gap-0.5">
+                {views.map(v => (
+                  <div key={v.date} className="flex-1 group h-full flex flex-col justify-end">
+                    <div
+                      className="w-full rounded-t-md transition-all duration-300 group-hover:opacity-75 relative"
+                      style={{ height: `${Math.max(2, (v.count / maxViews) * 100)}%`, background: '#333A2F' }}>
+                      {v.count > 0 && (
+                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-1.5 py-0.5 rounded-md opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity pointer-events-none z-10">
+                          {v.count}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex justify-between mt-2">
+              <span className="text-[10px] text-gray-400">{formatDate(views[0]?.date ?? '')}</span>
+              {range === 7 && views.slice(1, -1).map(v => (
+                <span key={v.date} className="text-[9px] text-gray-400">{formatDate(v.date)}</span>
+              ))}
+              <span className="text-[10px] text-gray-400">{formatDate(views[views.length - 1]?.date ?? '')}</span>
+            </div>
+          </>
         )}
       </div>
 
@@ -220,39 +224,42 @@ export default function AnalyticsTab() {
           <h3 className="font-semibold text-gray-800 text-sm">Lượt click theo ngày</h3>
         </div>
         {loading ? (
-          <div className="h-32 flex items-center justify-center">
+          <div className="h-[100px] flex items-center justify-center">
             <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#333A2F', borderTopColor: 'transparent' }} />
           </div>
         ) : (
-          <div className="flex items-end gap-1 h-32">
-            {clicksByDay.map(v => {
-              const maxC = Math.max(...clicksByDay.map(x => x.count), 1)
-              return (
-                <div key={v.date} className="flex-1 flex flex-col items-center gap-1 group">
-                  <div className="w-full relative flex flex-col justify-end" style={{ height: '100px' }}>
+          <>
+            <div className="relative" style={{ height: '100px' }}>
+              <div className="absolute inset-0 pointer-events-none">
+                {[75, 50, 25].map(pct => (
+                  <div key={pct} className="absolute left-0 right-0 border-t border-gray-100"
+                    style={{ bottom: `${pct}%` }} />
+                ))}
+              </div>
+              <div className="absolute inset-0 flex items-end gap-0.5">
+                {clicksByDay.map(v => (
+                  <div key={v.date} className="flex-1 group h-full flex flex-col justify-end">
                     <div
-                      className="w-full rounded-t-sm transition-all duration-300 group-hover:opacity-80 relative"
-                      style={{ height: `${Math.max(4, (v.count / maxC) * 100)}%`, background: '#2563eb' }}>
+                      className="w-full rounded-t-md transition-all duration-300 group-hover:opacity-75 relative"
+                      style={{ height: `${Math.max(2, (v.count / maxClicks) * 100)}%`, background: '#2563eb' }}>
                       {v.count > 0 && (
-                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity pointer-events-none">
+                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-1.5 py-0.5 rounded-md opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity pointer-events-none z-10">
                           {v.count}
                         </div>
                       )}
                     </div>
                   </div>
-                  {range <= 7 && (
-                    <span className="text-[9px] text-gray-400">{formatDate(v.date)}</span>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-        {range === 30 && (
-          <div className="flex justify-between mt-1">
-            <span className="text-[10px] text-gray-400">{formatDate(clicksByDay[0]?.date ?? '')}</span>
-            <span className="text-[10px] text-gray-400">{formatDate(clicksByDay[clicksByDay.length - 1]?.date ?? '')}</span>
-          </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex justify-between mt-2">
+              <span className="text-[10px] text-gray-400">{formatDate(clicksByDay[0]?.date ?? '')}</span>
+              {range === 7 && clicksByDay.slice(1, -1).map(v => (
+                <span key={v.date} className="text-[9px] text-gray-400">{formatDate(v.date)}</span>
+              ))}
+              <span className="text-[10px] text-gray-400">{formatDate(clicksByDay[clicksByDay.length - 1]?.date ?? '')}</span>
+            </div>
+          </>
         )}
       </div>
 

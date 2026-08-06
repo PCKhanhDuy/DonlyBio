@@ -437,12 +437,12 @@ export default function ExtrasTab() {
           </div>
           <Toggle on={emailEnabled} onChange={() => setEmailEnabled(v => !v)} />
         </div>
-        <p className="text-xs text-gray-400 -mt-2">Collect emails from visitors on your page.</p>
+        <p className="text-xs text-gray-400 -mt-2">Thu thập email từ khách ghé thăm trang của bạn.</p>
         {emailEnabled && (
           <>
             <input
               type="text" value={emailTitle} onChange={e => setEmailTitle(e.target.value)}
-              placeholder="Heading (e.g. Stay in the loop)" maxLength={60}
+              placeholder="Tiêu đề (vd: Đăng ký nhận tin)" maxLength={60}
               className={INPUT} />
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -477,7 +477,7 @@ export default function ExtrasTab() {
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-gray-400">No subscribers yet.</p>
+                <p className="text-xs text-gray-400">Chưa có subscriber nào.</p>
               )}
             </div>
           </>
@@ -490,7 +490,7 @@ export default function ExtrasTab() {
           <Heart size={16} className="text-gray-500" />
           <h3 className="font-semibold text-gray-800 text-sm">Tip Jar</h3>
         </div>
-        <p className="text-xs text-gray-400">Paste your MoMo, PayPal, Ko-fi, or any donation link.</p>
+        <p className="text-xs text-gray-400">Dán link MoMo, PayPal, Ko-fi hoặc bất kỳ link nhận tiền nào.</p>
         <input
           type="url" value={tipUrl} onChange={e => setTipUrl(e.target.value)}
           placeholder="https://ko-fi.com/yourname"
@@ -503,7 +503,7 @@ export default function ExtrasTab() {
           <Calendar size={16} className="text-gray-500" />
           <h3 className="font-semibold text-gray-800 text-sm">Booking Link</h3>
         </div>
-        <p className="text-xs text-gray-400">Paste your Calendly, Google Calendar, or booking page link.</p>
+        <p className="text-xs text-gray-400">Dán link Calendly, Google Calendar hoặc trang đặt lịch của bạn.</p>
         <input
           type="url" value={bookingUrl} onChange={e => setBookingUrl(e.target.value)}
           placeholder="https://calendly.com/yourname"

@@ -151,7 +151,7 @@ export default function ProductsTab() {
         {tab === 'url' && (
           <div className="relative">
             <LinkIcon size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="url" placeholder="Product image URL (optional)" value={imageUrl}
+            <input type="url" placeholder="URL ảnh sản phẩm (tuỳ chọn)" value={imageUrl}
               onChange={e => onUrlChange(e.target.value)}
               className={`w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#333A2F]`} />
           </div>
@@ -161,8 +161,8 @@ export default function ProductsTab() {
           <label className={`flex flex-col items-center justify-center gap-2 w-full py-7 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${uploading ? 'border-[#333A2F] bg-[#EBEDDF]' : 'border-gray-200 hover:border-[#333A2F]/50 hover:bg-[#EBEDDF]/40'}`}>
             <input type="file" accept="image/*" onChange={onUpload} className="hidden" disabled={uploading} />
             <Upload size={22} className={uploading ? 'animate-bounce' : 'text-gray-400'} style={uploading ? { color: '#333A2F' } : {}} />
-            <p className="text-sm font-medium text-gray-500">{uploading ? 'Uploading…' : 'Click to upload image'}</p>
-            <p className="text-xs text-gray-400">PNG, JPG, WebP — max 5 MB</p>
+            <p className="text-sm font-medium text-gray-500">{uploading ? 'Đang tải lên…' : 'Click để tải ảnh lên'}</p>
+            <p className="text-xs text-gray-400">PNG, JPG, WebP — tối đa 5 MB</p>
           </label>
         )}
 
@@ -188,14 +188,14 @@ export default function ProductsTab() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Affiliate Products</h2>
-          <p className="text-sm text-gray-500 mt-0.5">Showcase products and earn commissions.</p>
+          <h2 className="text-xl font-bold text-gray-900">Sản phẩm Affiliate</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Quản lý sản phẩm và kiếm hoa hồng từ affiliate.</p>
         </div>
         <button
           onClick={() => { setShowForm(s => !s); setEditId(null) }}
           className="flex items-center gap-2 px-4 py-2.5 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-all"
           style={{ background: '#333A2F' }}>
-          <Plus size={16} /> Add Product
+          <Plus size={16} /> Thêm sản phẩm
         </button>
       </div>
 
@@ -203,7 +203,7 @@ export default function ProductsTab() {
       {editId && (
         <form onSubmit={saveEdit} className="bg-white rounded-2xl border-2 p-5 shadow-sm space-y-4" style={{ borderColor: '#333A2F' }}>
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-800">Edit Product</h3>
+            <h3 className="font-semibold text-gray-800">Chỉnh sửa sản phẩm</h3>
             <button type="button" onClick={() => setEditId(null)}
               className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all">
               <X size={16} />
@@ -211,14 +211,14 @@ export default function ProductsTab() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input type="text" placeholder="Product name *" value={editForm.name} required
+            <input type="text" placeholder="Tên sản phẩm *" value={editForm.name} required
               onChange={e => setEditForm({ ...editForm, name: e.target.value })} className={INPUT} />
-            <input type="text" placeholder="Price (e.g. 250.000đ)" value={editForm.price}
+            <input type="text" placeholder="Giá (vd: 250.000đ)" value={editForm.price}
               onChange={e => setEditForm({ ...editForm, price: e.target.value })} className={INPUT} />
-            <input type="url" placeholder="Affiliate link *" value={editForm.affiliate_url} required
+            <input type="url" placeholder="Link affiliate *" value={editForm.affiliate_url} required
               onChange={e => setEditForm({ ...editForm, affiliate_url: e.target.value })}
               className={`${INPUT} sm:col-span-2`} />
-            <textarea placeholder="Description (optional)" value={editForm.description} rows={2}
+            <textarea placeholder="Mô tả (tuỳ chọn)" value={editForm.description} rows={2}
               onChange={e => setEditForm({ ...editForm, description: e.target.value })}
               className={`${INPUT} sm:col-span-2 resize-none`} />
           </div>
@@ -234,11 +234,11 @@ export default function ProductsTab() {
 
           <div className="flex gap-2 justify-end pt-1">
             <button type="button" onClick={() => setEditId(null)}
-              className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+              className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">Hủy</button>
             <button type="submit" disabled={saving || editImgUploading}
               className="px-4 py-2 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-colors disabled:opacity-50"
               style={{ background: '#333A2F' }}>
-              {saving ? 'Saving…' : 'Save Changes'}
+              {saving ? 'Đang lưu…' : 'Lưu thay đổi'}
             </button>
           </div>
         </form>
@@ -247,16 +247,16 @@ export default function ProductsTab() {
       {/* Add form */}
       {showForm && !editId && (
         <form onSubmit={handleAdd} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm space-y-4">
-          <h3 className="font-semibold text-gray-800">New Product</h3>
+          <h3 className="font-semibold text-gray-800">Sản phẩm mới</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input type="text" placeholder="Product name *" value={form.name} required
+            <input type="text" placeholder="Tên sản phẩm *" value={form.name} required
               onChange={e => setForm({ ...form, name: e.target.value })} className={INPUT} />
-            <input type="text" placeholder="Price (e.g. 250.000đ)" value={form.price}
+            <input type="text" placeholder="Giá (vd: 250.000đ)" value={form.price}
               onChange={e => setForm({ ...form, price: e.target.value })} className={INPUT} />
-            <input type="url" placeholder="Affiliate link *" value={form.affiliate_url} required
+            <input type="url" placeholder="Link affiliate *" value={form.affiliate_url} required
               onChange={e => setForm({ ...form, affiliate_url: e.target.value })}
               className={`${INPUT} sm:col-span-2`} />
-            <textarea placeholder="Description (optional)" value={form.description} rows={2}
+            <textarea placeholder="Mô tả (tuỳ chọn)" value={form.description} rows={2}
               onChange={e => setForm({ ...form, description: e.target.value })}
               className={`${INPUT} sm:col-span-2 resize-none`} />
           </div>
@@ -272,11 +272,11 @@ export default function ProductsTab() {
 
           <div className="flex gap-2 justify-end pt-1">
             <button type="button" onClick={() => { setShowForm(false); setForm(EMPTY) }}
-              className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+              className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">Hủy</button>
             <button type="submit" disabled={saving || imgUploading}
               className="px-4 py-2 text-white text-sm font-medium rounded-xl disabled:opacity-50"
               style={{ background: '#333A2F' }}>
-              {saving ? 'Saving…' : 'Add Product'}
+              {saving ? 'Đang thêm…' : 'Thêm sản phẩm'}
             </button>
           </div>
         </form>
@@ -290,8 +290,8 @@ export default function ProductsTab() {
       ) : products.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
           <ShoppingBag size={32} className="mx-auto text-gray-300 mb-3" />
-          <p className="text-sm font-semibold text-gray-500">No products yet</p>
-          <p className="text-xs text-gray-400 mt-1">Add your first affiliate product to get started.</p>
+          <p className="text-sm font-semibold text-gray-500">Chưa có sản phẩm nào</p>
+          <p className="text-xs text-gray-400 mt-1">Thêm sản phẩm affiliate đầu tiên của bạn.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -330,39 +330,41 @@ export default function ProductsTab() {
                   <p className="text-gray-400 text-xs mt-1.5 line-clamp-2 leading-relaxed">{p.description}</p>
                 )}
 
-                <div className="flex gap-1.5 mt-3">
-                  <a href={p.affiliate_url} target="_blank" rel="noreferrer"
-                    className="flex-1 flex items-center justify-center gap-1 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 text-xs font-medium rounded-xl transition-colors">
-                    <ExternalLink size={11} /> View
-                  </a>
-                  <button onClick={() => startEdit(p)} className="p-2 text-gray-400 hover:text-[#333A2F] hover:bg-[#EBEDDF] rounded-xl transition-all" title="Edit">
-                    <Pencil size={14} />
-                  </button>
-                  <div className="flex flex-col gap-0.5">
-                    <button onClick={() => move(products.indexOf(p), -1)} disabled={products.indexOf(p) === 0}
-                      className="p-1 text-gray-300 hover:text-gray-600 disabled:opacity-20 transition-colors rounded">
-                      <ChevronUp size={13} />
+                {deletingId === p.id ? (
+                  <div className="flex gap-1.5 mt-3">
+                    <button onClick={() => remove(p.id)}
+                      className="flex-1 flex items-center justify-center gap-1 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold rounded-xl transition-colors">
+                      <Trash2 size={11} /> Xóa
                     </button>
-                    <button onClick={() => move(products.indexOf(p), 1)} disabled={products.indexOf(p) === products.length - 1}
-                      className="p-1 text-gray-300 hover:text-gray-600 disabled:opacity-20 transition-colors rounded">
-                      <ChevronDown size={13} />
+                    <button onClick={() => setDeletingId(null)}
+                      className="px-3 py-2 text-gray-500 hover:bg-gray-100 text-xs rounded-xl transition-colors">
+                      Hủy
                     </button>
                   </div>
-                  {deletingId === p.id ? (
-                    <div className="flex flex-col gap-1">
-                      <button onClick={() => remove(p.id)} className="px-2 py-1 text-[10px] font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg">
-                        Delete
+                ) : (
+                  <div className="flex gap-1.5 mt-3">
+                    <a href={p.affiliate_url} target="_blank" rel="noreferrer"
+                      className="flex-1 flex items-center justify-center gap-1 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 text-xs font-medium rounded-xl transition-colors">
+                      <ExternalLink size={11} /> Xem
+                    </a>
+                    <button onClick={() => startEdit(p)} className="p-2 text-gray-400 hover:text-[#333A2F] hover:bg-[#EBEDDF] rounded-xl transition-all" title="Chỉnh sửa">
+                      <Pencil size={14} />
+                    </button>
+                    <div className="flex flex-col gap-0.5">
+                      <button onClick={() => move(products.indexOf(p), -1)} disabled={products.indexOf(p) === 0}
+                        className="p-1 text-gray-300 hover:text-gray-600 disabled:opacity-20 transition-colors rounded">
+                        <ChevronUp size={13} />
                       </button>
-                      <button onClick={() => setDeletingId(null)} className="px-2 py-1 text-[10px] text-gray-500 hover:bg-gray-100 rounded-lg">
-                        Cancel
+                      <button onClick={() => move(products.indexOf(p), 1)} disabled={products.indexOf(p) === products.length - 1}
+                        className="p-1 text-gray-300 hover:text-gray-600 disabled:opacity-20 transition-colors rounded">
+                        <ChevronDown size={13} />
                       </button>
                     </div>
-                  ) : (
                     <button onClick={() => setDeletingId(p.id)} className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
                       <Trash2 size={14} />
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
